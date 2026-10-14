@@ -38,7 +38,7 @@ Há `header`, `nav`, `main`, `section`, `article` e `footer`. Links navegam; bot
 
 ## Decisões de UI/UX
 
-A home organiza descoberta: destaque, estilos, populares e novidades. O catálogo concentra ferramentas de pesquisa. Roxo identifica ações principais, ciano aparece em detalhes e o fundo escuro dá protagonismo às ilustrações. Textos informam que os jogos são fictícios. Os cards expõem categoria e popularidade sem sobrecarregar. O mobile reorganiza o grid e disponibiliza a navegação em menu. Estados vazios orientam o próximo passo; erros oferecem recuperação.
+A home organiza descoberta: destaque, estilos, populares e novidades. O catálogo concentra ferramentas de pesquisa. O visual usa grafite e detalhes em cobre, com um painel claro para separar os dados do destaque de sua capa. Títulos serifados e uma lista compacta de lançamentos criam variação sem adicionar efeitos decorativos. O modo demo identifica dados fictícios; o modo real mostra a fonte RAWG. Os cards expõem categoria e popularidade sem sobrecarregar. O mobile reorganiza o grid e disponibiliza a navegação em menu. Estados vazios orientam o próximo passo; erros oferecem recuperação.
 
 ## Dificuldades e soluções
 

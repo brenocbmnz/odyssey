@@ -48,3 +48,9 @@ A pesquisa mantém foco no input com `role=combobox`, `aria-autocomplete=list`, 
 Os testes de descoberta cobrem controles do carrossel, seleção por teclado, Escape, limpar, busca completa, estado vazio, clique/toque, idioma e auditoria axe com a lista aberta.
 
 Referências: [padrão de carrossel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) e [padrão de combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
+
+### Transições e painel adaptativo
+
+As cores são derivadas de pixels e combinadas com grafite antes de compor o painel. O texto claro mantém a legibilidade; o fallback também é escuro. Os testes verificam contraste de pelo menos 4,5:1 para o texto secundário em capas de cores extremas. As imagens ocultas do carrossel são decorativas e ficam fora da árvore de acessibilidade. A troca aguarda o carregamento da próxima capa, e o painel indica ocupação durante essa espera.
+
+`prefers-reduced-motion` desativa o fade do texto, o fade entre imagens e a transição de cor. Playwright verifica a troca efetiva da cor, estabilidade da altura e ausência de animação quando essa preferência está ativa.

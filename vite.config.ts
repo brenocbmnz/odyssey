@@ -1,6 +1,7 @@
 import { defineConfig } from "vitest/config";
 import { loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import { handleArtwork } from "./server/artwork.js";
 import { handleRawg } from "./server/rawg.js";
 import tailwindcss from "@tailwindcss/vite";
 export default defineConfig(({ mode }) => {
@@ -14,7 +15,9 @@ export default defineConfig(({ mode }) => {
         configureServer(server) {
           if (env.VITE_GAME_SOURCE !== "rawg") return;
           server.middlewares.use((req, res, next) => {
-            if (req.url?.startsWith("/api/games"))
+            if (req.url?.startsWith("/api/artwork"))
+              void handleArtwork(req, res);
+            else if (req.url?.startsWith("/api/games"))
               void handleRawg(req, res, env.RAWG_API_KEY);
             else next();
           });

@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import {
-  ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-} from "lucide-react";
+  artworkSource,
+  neutralPanel,
+  panelFromImage,
+} from "../../utils/artwork";
+import { useState, useEffect, type CSSProperties } from "react";
+import { Link } from "@tanstack/react-router";
+import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Game } from "../../types/game";
 import { Button } from "../ui/button";
 import { useLanguage } from "../../i18n/LanguageContext";
@@ -18,14 +18,41 @@ export function FeaturedCarousel({
 }) {
   const { t, locale } = useLanguage();
   const [selected, setSelected] = useState(0);
+  const [pending, setPending] = useState<number | null>(null);
+  const [panels, setPanels] = useState<Record<string, string>>({});
   const slides = games.slice(0, 5);
   const index = slides.length ? selected % slides.length : 0;
   const game = slides[index];
+  const targetId = pending === null ? undefined : slides[pending]?.id;
+  useEffect(() => {
+    if (pending === null) return;
+    if (!targetId) {
+      setPending(null);
+      return;
+    }
+    if (panels[targetId]) {
+      setSelected(pending);
+      setPending(null);
+    }
+  }, [panels, pending, targetId]);
+  const select = (position: number) => {
+    if (panels[slides[position]?.id]) {
+      setSelected(position);
+      setPending(null);
+    } else setPending(position);
+  };
   const move = (offset: number) =>
-    setSelected((index + offset + slides.length) % slides.length);
+    select(((pending ?? index) + offset + slides.length) % slides.length);
   return (
     <section
       className="hero rawg-hero hero-carousel"
+      style={
+        {
+          "--carousel-panel": (game && panels[game.id]) || neutralPanel,
+        } as CSSProperties
+      }
+      aria-busy={pending !== null}
+      data-panel-ready={Boolean(game && panels[game.id])}
       aria-label={t("Jogos em destaque")}
       aria-roledescription={t("carrossel")}
     >
@@ -44,59 +71,92 @@ export function FeaturedCarousel({
             : t("Jogo em destaque")
         }
       >
-        <img
-          key={game?.id ?? "placeholder"}
-          src={
-            game?.source === "rawg"
-              ? game.image
-              : game?.id === "1" || !game
-                ? "/art/hero.svg"
-                : game.image
-          }
-          alt=""
-          onError={(event) => {
-            event.currentTarget.onerror = null;
-            event.currentTarget.src = "/art/hero.svg";
-          }}
-        />
+        <div className="carousel-artwork" aria-hidden="true">
+          {(slides.length ? slides : [undefined]).map((slide, i) => {
+            const original =
+              slide?.source === "rawg"
+                ? slide.image
+                : slide?.id === "1" || !slide
+                  ? "/art/hero.svg"
+                  : slide.image;
+            const src = artworkSource(original);
+            return (
+              <img
+                key={slide?.id ?? "placeholder"}
+                src={src}
+                className={i === index ? "artwork-active" : ""}
+                alt=""
+                decoding="async"
+                onLoad={(event) => {
+                  if (slide) {
+                    const panel = panelFromImage(event.currentTarget);
+                    setPanels((previous) =>
+                      previous[slide.id] === panel
+                        ? previous
+                        : { ...previous, [slide.id]: panel },
+                    );
+                  }
+                }}
+                onError={(event) => {
+                  const image = event.currentTarget;
+                  if (src !== original && !image.dataset.retried) {
+                    image.dataset.retried = "true";
+                    image.src = original;
+                  } else if (!image.dataset.fallback) {
+                    image.dataset.fallback = "true";
+                    image.src = "/art/hero.svg";
+                  }
+                }}
+              />
+            );
+          })}
+        </div>
         <div className="hero-content">
-          <span className="featured-tag">
-            <Sparkles size={13} />
-            {t("DESTAQUE DO CATÁLOGO")}
-          </span>
-          <h2>{game?.name ?? t("Descubra novos mundos")}</h2>
-          <p>{t("Conheça uma das grandes descobertas do catálogo.")}</p>
-          {game && (
-            <div className="hero-meta">
-              <span>{t(game.category)}</span>
-              <span>
-                {game.source === "rawg"
-                  ? t("★ {rating}/5 na RAWG", {
-                      rating: new Intl.NumberFormat(locale).format(
-                        game.rating ?? 0,
-                      ),
-                    })
-                  : t("★ {value}% de popularidade", { value: game.popularity })}
-              </span>
-            </div>
-          )}
-          {game ? (
-            <Button asChild>
-              <Link to="/games/$gameId" params={{ gameId: game.id }}>
-                {t("Conhecer o jogo")}
-                <ArrowUpRight size={17} />
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild>
-              <Link
-                to="/catalog"
-                search={{ q: "", category: "", sort: "popularity" }}
-              >
-                {t("Explorar catálogo")}
-              </Link>
-            </Button>
-          )}
+          <div key={game?.id ?? "placeholder"} className="carousel-copy">
+            <span className="featured-tag">{t("NO RADAR")}</span>
+            <h2>
+              {game?.name ??
+                t(loading ? "Carregando jogos" : "Nenhum destaque disponível")}
+            </h2>
+            <p>
+              {t(
+                "Confira os detalhes, a avaliação e outros jogos do mesmo gênero.",
+              )}
+            </p>
+            {game && (
+              <div className="hero-meta">
+                <span>{t(game.category)}</span>
+                <span>
+                  {game.source === "rawg"
+                    ? t("★ {rating}/5 na RAWG", {
+                        rating: new Intl.NumberFormat(locale).format(
+                          game.rating ?? 0,
+                        ),
+                      })
+                    : t("★ {value}% de popularidade", {
+                        value: game.popularity,
+                      })}
+                </span>
+              </div>
+            )}
+            {game ? (
+              <Button asChild>
+                <Link to="/games/$gameId" params={{ gameId: game.id }}>
+                  {t("Conhecer o jogo")}
+                  <ArrowUpRight size={17} />
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link
+                  to="/catalog"
+                  search={{ q: "", category: "", sort: "popularity" }}
+                >
+                  {t("Explorar catálogo")}
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
       <div className="carousel-controls">
@@ -111,7 +171,7 @@ export function FeaturedCarousel({
               aria-label={t("Mostrar {name}", { name: slide.name })}
               aria-current={i === index ? "true" : undefined}
               aria-controls="featured-slide"
-              onClick={() => setSelected(i)}
+              onClick={() => select(i)}
             >
               <span />
             </button>

@@ -1,4 +1,22 @@
 export const english: Record<string, string> = {
+  "CATÁLOGO DE JOGOS": "GAME CATALOG",
+  "O que jogar agora?": "What to play next?",
+  "Veja os jogos, compare as avaliações e salve os que você quer jogar.":
+    "Browse games, compare ratings, and save the ones you want to play.",
+  "Navegue por gênero": "Browse by genre",
+  "Ordenados pelas adições dos usuários na RAWG.":
+    "Ranked by user additions on RAWG.",
+  "Ordenados pela popularidade no catálogo demo.":
+    "Ranked by popularity in the demo catalog.",
+  "Por data de lançamento, dos mais novos aos mais antigos.":
+    "By release date, from newest to oldest.",
+  NAVEGAÇÃO: "NAVIGATION",
+  "Sua lista do que jogar depois.": "Your list of what to play next.",
+  "Catálogo de jogos · Odyssey": "Game catalog · Odyssey",
+  "NO RADAR": "ON THE RADAR",
+  "Confira os detalhes, a avaliação e outros jogos do mesmo gênero.":
+    "Check the details, rating, and other games in the same genre.",
+
   "Jogos em destaque": "Featured games",
   carrossel: "carousel",
   slide: "slide",

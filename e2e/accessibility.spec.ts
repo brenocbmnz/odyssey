@@ -24,6 +24,18 @@ test.beforeEach(async ({ page }) => {
     );
 });
 async function audit(page: Page) {
+  if (await page.locator(".carousel-copy").count())
+    await expect
+      .poll(() =>
+        page
+          .locator(".carousel-copy")
+          .evaluate((node) =>
+            node
+              .getAnimations()
+              .every((animation) => animation.playState === "finished"),
+          ),
+      )
+      .toBe(true);
   const result = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();
@@ -46,7 +58,7 @@ test("idioma persistido, conteúdo traduzido, foco e auditoria ARIA/WCAG", async
     .selectOption("en");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(
-    page.getByRole("heading", { name: "Your next favorite game is here." }),
+    page.getByRole("heading", { name: "What to play next?" }),
   ).toBeVisible();
   await page.reload();
   await expect(page.getByRole("combobox", { name: "Language" })).toHaveValue(

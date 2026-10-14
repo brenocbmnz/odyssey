@@ -1,7 +1,7 @@
 import { useId } from "react";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { Link } from "@tanstack/react-router";
-import { Heart, ArrowUpRight, Flame } from "lucide-react";
+import { Heart, ArrowUpRight, Star } from "lucide-react";
 import type { Game } from "../../types/game";
 import { useFavorites } from "../../contexts/FavoritesContext";
 export function GameCard({ game }: { game: Game }) {
@@ -26,7 +26,6 @@ export function GameCard({ game }: { game: Game }) {
               event.currentTarget.src = "/art/game-0.svg";
             }}
           />
-          <span className="art-title">{game.name}</span>
         </Link>
         <button
           className={`favorite-button ${saved ? "saved" : ""}`}
@@ -47,7 +46,7 @@ export function GameCard({ game }: { game: Game }) {
                 : t("Popularidade fictícia")}
               :{" "}
             </span>
-            <Flame size={13} />{" "}
+            <Star size={13} />{" "}
             {game.source === "rawg"
               ? `${new Intl.NumberFormat(locale).format(game.rating ?? 0)}/5`
               : `${game.popularity}%`}

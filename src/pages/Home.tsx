@@ -1,22 +1,11 @@
 import { useLanguage } from "../i18n/LanguageContext";
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Flame,
-  Sparkles,
-  Zap,
-  Puzzle,
-  Castle,
-  Map,
-  Coffee,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useGames } from "../hooks/useGames";
 import { GameGrid } from "../components/games/GameGrid";
 import { FeaturedCarousel } from "../components/games/FeaturedCarousel";
 import { categories } from "../types/game";
 import { isRawg } from "../config/source";
-const icons = [Zap, Puzzle, Castle, Map, Coffee];
 export function Home() {
   const { t } = useLanguage();
   const popular = useGames({ sort: "popularity" });
@@ -25,23 +14,14 @@ export function Home() {
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">{t("UM NOVO UNIVERSO A CADA CLIQUE")}</div>
-          <h1>
-            {t("Seu próximo jogo favorito está aqui")}
-            <span className="purple-dot">.</span>
-          </h1>
+          <div className="eyebrow">{t("CATÁLOGO DE JOGOS")}</div>
+          <h1>{t("O que jogar agora?")}</h1>
           <p>
             {t(
-              "Descubra novas aventuras. Explore possibilidades. Jogue do seu jeito.",
+              "Veja os jogos, compare as avaliações e salve os que você quer jogar.",
             )}
           </p>
         </div>
-        <span className="collection-badge">
-          <span className="online-dot" />
-          {isRawg
-            ? t("Jogos reais para descobrir")
-            : t("25 jogos para descobrir")}
-        </span>
       </div>
       <FeaturedCarousel
         games={popular.data?.games}
@@ -49,40 +29,32 @@ export function Home() {
       />
       <section className="categories-section">
         <div className="section-heading">
-          <h2>{t("Encontre seu estilo")}</h2>
-          <span>{t("Um mundo de possibilidades")}</span>
+          <h2>{t("Navegue por gênero")}</h2>
         </div>
         <div className="category-grid">
-          {categories.map((category, i) => {
-            const Icon = icons[i];
-            return (
-              <Link
-                to="/catalog"
-                search={{ category, q: "", sort: "popularity" }}
-                className={`category category-${i}`}
-                key={category}
-              >
-                <span className="category-icon">
-                  <Icon size={22} />
-                </span>
-                <div>
-                  <strong>{t(category)}</strong>
-                  <small>{isRawg ? t("Explorar gênero") : t("5 jogos")}</small>
-                </div>
-                <ArrowUpRight size={15} />
-              </Link>
-            );
-          })}
+          {categories.map((category) => (
+            <Link
+              to="/catalog"
+              search={{ category, q: "", sort: "popularity" }}
+              className="category"
+              key={category}
+            >
+              {t(category)} <span aria-hidden="true">↗</span>
+            </Link>
+          ))}
         </div>
       </section>
       <section>
         <div className="section-heading">
           <div>
-            <h2>
-              <Flame size={21} className="purple" />
-              {t("Em alta agora")}
-            </h2>
-            <p>{t("Os favoritos da comunidade, esperando por você.")}</p>
+            <h2>{t("Em alta agora")}</h2>
+            <p>
+              {t(
+                isRawg
+                  ? "Ordenados pelas adições dos usuários na RAWG."
+                  : "Ordenados pela popularidade no catálogo demo.",
+              )}
+            </p>
           </div>
           <Link
             to="/catalog"
@@ -103,11 +75,10 @@ export function Home() {
       <section>
         <div className="section-heading">
           <div>
-            <h2>
-              <Sparkles size={20} className="cyan" />
-              {t("Acabaram de chegar")}
-            </h2>
-            <p>{t("Novos mundos para adicionar à sua coleção.")}</p>
+            <h2>{t("Acabaram de chegar")}</h2>
+            <p>
+              {t("Por data de lançamento, dos mais novos aos mais antigos.")}
+            </p>
           </div>
           <Link to="/catalog" search={{ sort: "release", q: "", category: "" }}>
             {t("Ver novidades")}
@@ -115,6 +86,7 @@ export function Home() {
           </Link>
         </div>
         <GameGrid
+          layout="list"
           label={t("Acabaram de chegar")}
           games={recent.data?.games.slice(0, 4)}
           loading={recent.isPending}
@@ -122,23 +94,6 @@ export function Home() {
           retry={() => void recent.refetch()}
         />
       </section>
-      <div className="bottom-banner">
-        <GamepadMark />
-        <div>
-          <h2>{t("Grandes descobertas começam com curiosidade.")}</h2>
-          <p>{t("Seu novo favorito pode estar a um clique de distância.")}</p>
-        </div>
-        <Link
-          to="/catalog"
-          search={{ q: "", category: "", sort: "popularity" }}
-        >
-          {t("Explorar todos os jogos")}
-          <ArrowRight size={17} />
-        </Link>
-      </div>
     </>
   );
-}
-function GamepadMark() {
-  return <span className="bottom-mark">✦</span>;
 }

@@ -6,7 +6,7 @@ test("API de produção, navegação, busca e favoritos persistentes", async ({
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /Seu próximo jogo favorito/ }),
+    page.getByRole("heading", { name: /O que jogar agora/ }),
   ).toBeVisible();
   await expect(page.locator(".game-card")).toHaveCount(8);
   await page.screenshot({
@@ -49,7 +49,7 @@ test("API de produção, navegação, busca e favoritos persistentes", async ({
     await page.getByRole("button", { name: "Abrir navegação" }).click();
     await page.getByRole("link", { name: "Visão geral" }).click();
     await expect(
-      page.getByRole("heading", { name: /Seu próximo jogo favorito/ }),
+      page.getByRole("heading", { name: /O que jogar agora/ }),
     ).toBeVisible();
   }
   expect(

@@ -12,6 +12,7 @@ export function GameGrid({
   empty,
   id,
   label,
+  layout = "grid",
 }: {
   games?: Game[];
   loading?: boolean;
@@ -20,6 +21,7 @@ export function GameGrid({
   empty?: string;
   id?: string;
   label?: string;
+  layout?: "grid" | "list";
 }) {
   const { t } = useLanguage();
   const region = useRef<HTMLDivElement>(null);
@@ -45,7 +47,10 @@ export function GameGrid({
       >
         {loading ? (
           <>
-            <div className="game-grid" aria-hidden="true">
+            <div
+              className={`game-grid ${layout === "list" ? "game-list" : ""}`}
+              aria-hidden="true"
+            >
               {Array.from({ length: 8 }, (_, i) => (
                 <div className="skeleton" key={i} />
               ))}
@@ -79,7 +84,7 @@ export function GameGrid({
             </p>
           </div>
         ) : (
-          <div className="game-grid">
+          <div className={`game-grid ${layout === "list" ? "game-list" : ""}`}>
             {games.map((game) => (
               <GameCard key={game.id} game={game} />
             ))}

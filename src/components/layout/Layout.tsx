@@ -1,16 +1,7 @@
 import { SearchBar } from "./SearchBar";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import {
-  Gamepad2,
-  LayoutDashboard,
-  Compass,
-  Heart,
-  ArrowUpRight,
-  Menu,
-  X,
-  Sparkles,
-} from "lucide-react";
+import { LayoutDashboard, Compass, Heart, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import { isRawg } from "../../config/source";
@@ -72,11 +63,7 @@ export function Layout() {
         className={`sidebar ${open ? "is-open" : ""}`}
       >
         <Link to="/" className="brand">
-          <span className="brand-icon">
-            <Gamepad2 size={23} />
-          </span>
           Odyssey
-          <i />
         </Link>
         <button
           ref={closeButton}
@@ -89,7 +76,7 @@ export function Layout() {
         >
           <X />
         </button>
-        <p className="nav-label">{t("EXPLORE SEU UNIVERSO")}</p>
+        <p className="nav-label">{t("NAVEGAÇÃO")}</p>
         <nav aria-label={t("Navegação principal")}>
           <Link
             to="/"
@@ -117,22 +104,9 @@ export function Layout() {
           </Link>
         </nav>
         <div className="sidebar-bottom">
-          <div className="discovery">
-            <Sparkles size={23} />
-            <h2>
-              {t("Sua próxima aventura")}
-              <br />
-              {t("começa aqui.")}
-            </h2>
-            <p>{t("Explore. Descubra. Favorite.")}</p>
-            <Link
-              to="/catalog"
-              search={{ q: "", category: "", sort: "popularity" }}
-            >
-              {t("Explorar catálogo")}
-              <ArrowUpRight size={16} />
-            </Link>
-          </div>
+          <p className="sidebar-caption">
+            {t("Sua lista do que jogar depois.")}
+          </p>
           <div className="demo-note">
             <span className="online-dot" />
             {isRawg ? t("Catálogo conectado") : t("Ambiente de demonstração")}
@@ -174,10 +148,6 @@ export function Layout() {
                 </option>
               </select>
             </label>
-            <span className="demo-badge">{isRawg ? "RAWG" : "DEMO"}</span>
-            <span className="avatar" aria-hidden="true">
-              OD
-            </span>
           </div>
         </header>
         <main
@@ -206,10 +176,7 @@ export function Layout() {
               </>
             )}
           </span>
-          <span>
-            {t("Feito para quem ama descobrir jogos.")}
-            <span className="footer-dot">✦</span>
-          </span>
+          <span>{t("Catálogo de jogos · Odyssey")}</span>
         </footer>
       </div>
       <div className="sr-only" role="status" aria-atomic="true">

@@ -44,8 +44,21 @@ test("carrossel, sugestões por teclado, pesquisa completa e estados vazios", as
   );
   await expect(hero.locator(".carousel-dots button")).toHaveCount(5);
   const first = await hero.locator("h2").innerText();
+  await expect(hero).toHaveAttribute("data-panel-ready", "true");
+  const firstPanel = await hero.evaluate((node) =>
+    (node as HTMLElement).style.getPropertyValue("--carousel-panel"),
+  );
+  const firstHeight = (await hero.boundingBox())?.height;
   await page.getByRole("button", { name: "Próximo destaque" }).click();
   await expect(hero.locator("h2")).not.toHaveText(first);
+  await expect
+    .poll(() =>
+      hero.evaluate((node) =>
+        (node as HTMLElement).style.getPropertyValue("--carousel-panel"),
+      ),
+    )
+    .not.toBe(firstPanel);
+  expect((await hero.boundingBox())?.height).toBe(firstHeight);
   await page.getByRole("button", { name: "Destaque anterior" }).click();
   await expect(hero.locator("h2")).toHaveText(first);
   await hero.locator(".carousel-dots button").nth(2).click();
@@ -59,6 +72,23 @@ test("carrossel, sugestões por teclado, pesquisa completa e estados vazios", as
     "aria-current",
     "true",
   );
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.getByRole("button", { name: "Próximo destaque" }).click();
+  await expect(hero.locator(".carousel-dots button").nth(2)).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  expect(
+    await hero
+      .locator(".artwork-active")
+      .evaluate((node) => getComputedStyle(node).transitionDuration),
+  ).toBe("0s");
+  expect(
+    await hero
+      .locator(".carousel-copy")
+      .evaluate((node) => node.getAnimations().length),
+  ).toBe(0);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   const input = page.getByRole("combobox", {
     name: "Pesquisar jogos",
     exact: true,
@@ -68,6 +98,17 @@ test("carrossel, sugestões por teclado, pesquisa completa e estados vazios", as
     name: real ? /Portal 2/ : /Crystal Quest/,
   });
   await expect(option).toBeVisible({ timeout: 10000 });
+  await expect
+    .poll(() =>
+      page
+        .locator(".carousel-copy")
+        .evaluate((node) =>
+          node
+            .getAnimations()
+            .every((animation) => animation.playState === "finished"),
+        ),
+    )
+    .toBe(true);
   const audit = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
     .analyze();

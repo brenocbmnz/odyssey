@@ -62,7 +62,7 @@ No modo RAWG, os filtros usam Ação, Puzzle, Estratégia, Aventura e Casual. Os
 ## Arquitetura
 
 ```text
-api/                    Entradas das funções Vercel
+api/                    Funções Vercel: jogos e proxy de capas
 server/rawg.ts          Proxy, filtros, normalização e erros upstream
 src/config/             Seleção demo/RAWG
 src/i18n/               Contexto de idioma, interpolação e dicionário inglês
@@ -146,6 +146,12 @@ Os testes de navegador incluem axe-core com regras WCAG A/AA, nos dois idiomas e
 
 ## Descoberta e pesquisa
 
-O componente `FeaturedCarousel` reutiliza os jogos populares já consultados e mostra um destaque por vez. Setas e indicadores são botões nativos; o slide é nomeado por posição e jogo. A troca é manual, sem avanço automático, e as transições respeitam redução de movimento.
+O componente `FeaturedCarousel` reutiliza os jogos populares já consultados e mostra um destaque por vez. Setas e indicadores são botões nativos; o slide é nomeado por posição e jogo. A troca é manual, sem avanço automático. As capas são pré-carregadas e usam fade cruzado; o texto entra com fade in. O painel recebe uma tonalidade escura derivada dos pixels da capa, com contraste preservado. As transições respeitam redução de movimento.
 
 O `SearchBar` implementa uma combobox com listbox de até seis sugestões. As consultas só iniciam com pelo menos dois caracteres e após debounce de 350ms. Setas movem a opção ativa, Enter abre o jogo escolhido e Escape fecha a lista mantendo o foco. Sem opção ativa, Enter pesquisa no catálogo. A URL do catálogo sincroniza o texto da pesquisa. Erros e ausência de resultados são explícitos; o catálogo continua disponível para realizar a busca completa.
+
+### Cores das capas
+
+`GET /api/artwork?url=...` serve somente imagens HTTPS de `media.rawg.io/media/`. Essa rota permite ler os pixels em canvas sem depender de CORS do CDN. Ela bloqueia outras origens, portas, credenciais, redirecionamentos, conteúdo que não seja imagem e arquivos acima de 4 MiB. Respostas bem-sucedidas têm cache compartilhado de um dia.
+
+O navegador reduz a imagem a 32×32 pixels, agrupa cores e mistura a predominante com uma base grafite. Se não puder extrair a cor, conserva um painel grafite. A função não usa a chave RAWG. Não são necessárias novas variáveis de ambiente.
