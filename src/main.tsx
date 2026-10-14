@@ -29,6 +29,6 @@ void start().catch(() => {
   const root = document.getElementById("root");
   if (root) {
     root.innerHTML =
-      '<main class="empty" role="alert"><h1>Não foi possível iniciar o GameHub</h1><p>A API demonstrativa precisa de um navegador com Service Worker e de HTTPS ou localhost.</p><button onclick="location.reload()">Tentar novamente</button></main>';
+      '<main class="empty" role="alert"><h1>Não foi possível iniciar o Odyssey</h1><p>A API demonstrativa precisa de um navegador com Service Worker e de HTTPS ou localhost.</p><button onclick="location.reload()">Tentar novamente</button></main>';
   }
 });

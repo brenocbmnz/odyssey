@@ -1,4 +1,4 @@
-# Como apresentar o GameHub na entrevista
+# Como apresentar o Odyssey na entrevista
 
 ## Roteiro de demonstração
 

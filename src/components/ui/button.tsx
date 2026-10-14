@@ -16,7 +16,7 @@ const variants = cva(
     defaultVariants: { variant: "default" },
   },
 );
-// Padrão composicional de Button do shadcn/ui, adaptado à identidade GameHub.
+// Padrão composicional de Button do shadcn/ui, adaptado à identidade Odyssey.
 export function Button({
   asChild = false,
   variant,

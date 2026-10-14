@@ -1,4 +1,4 @@
-# GameHub
+# Odyssey
 
 Plataforma de descoberta de jogos fictícios desenvolvida para apresentação técnica de front-end. Interface em português, tema escuro, ilustrações SVG originais e locais, 25 jogos distribuídos em cinco categorias. Não há jogos executáveis, apostas, autenticação ou backend real.
 
@@ -74,7 +74,7 @@ O MSW intercepta requisições reais do Axios, sem um servidor próprio:
 
 O worker inicia **antes** do React tanto em desenvolvimento quanto em produção, sem condicionamento a `import.meta.env.DEV`. `public/mockServiceWorker.js` entra no build. MSW v3 usa a opção `onUnhandledFrame: 'bypass'` para requisições fora da API. É necessário HTTPS ou localhost e suporte a Service Worker. Falhas de inicialização mostram uma mensagem e opção de recarregar.
 
-As consultas têm `staleTime` de 60 segundos. A chave inclui os filtros, impedindo mistura de resultados. Uma falha é repetida uma vez; o botão de erro executa refetch. AbortSignal permite cancelamento de requisições. Favoritos usam a chave versionada `gamehub:favorites:v1`; localStorage não é banco de dados nem sincroniza dispositivos.
+As consultas têm `staleTime` de 60 segundos. A chave inclui os filtros, impedindo mistura de resultados. Uma falha é repetida uma vez; o botão de erro executa refetch. AbortSignal permite cancelamento de requisições. A chave foi mantida para preservar favoritos de versões anteriores. Favoritos usam a chave versionada `gamehub:favorites:v1`; localStorage não é banco de dados nem sincroniza dispositivos.
 
 ## Testes
 

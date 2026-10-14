@@ -24,7 +24,7 @@ async function renderApp(path: string) {
     </QueryClientProvider>,
   );
 }
-describe("GameHub", () => {
+describe("Odyssey", () => {
   it("renderiza cards com imagem, categoria e link de detalhes", async () => {
     await renderApp("/catalog");
     expect(

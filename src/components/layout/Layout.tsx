@@ -51,7 +51,7 @@ export function Layout() {
           <span className="brand-icon">
             <Gamepad2 size={23} />
           </span>
-          game<span>hub</span>
+          Odyssey
           <i />
         </Link>
         <button
@@ -148,7 +148,7 @@ export function Layout() {
           <div className="header-right">
             <span className="demo-badge">DEMO</span>
             <span className="avatar" aria-label="Perfil de visitante">
-              GH
+              OD
             </span>
           </div>
         </header>
@@ -156,7 +156,7 @@ export function Layout() {
           <Outlet />
         </main>
         <footer>
-          <span>© 2026 GameHub</span>
+          <span>© 2026 Odyssey</span>
           <span>
             Feito para quem ama descobrir jogos.
             <span className="footer-dot">✦</span>
