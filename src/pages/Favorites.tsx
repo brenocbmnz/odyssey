@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useFavorites } from "../contexts/FavoritesContext";
-import { useGames } from "../hooks/useGames";
+import { useFavoriteGames } from "../hooks/useFavoriteGames";
 import { GameGrid } from "../components/games/GameGrid";
 import { Button } from "../components/ui/button";
 export function Favorites() {
   const { favorites } = useFavorites();
-  const query = useGames();
+  const query = useFavoriteGames(favorites);
   return (
     <>
       <div className="page-heading">
@@ -18,10 +18,10 @@ export function Favorites() {
         </div>
       </div>
       <GameGrid
-        games={query.data?.filter((game) => favorites.includes(game.id))}
-        loading={query.isPending}
-        error={query.isError}
-        retry={() => void query.refetch()}
+        games={query.games}
+        loading={query.loading}
+        error={query.error}
+        retry={query.retry}
         empty="Use o coração nos cards para começar sua coleção. Seus favoritos ficam salvos neste navegador."
       />
       {!favorites.length && (

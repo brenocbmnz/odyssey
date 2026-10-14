@@ -5,10 +5,13 @@ import { useGame, useGames } from "../hooks/useGames";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { GameGrid } from "../components/games/GameGrid";
 import { Button } from "../components/ui/button";
+import { categories } from "../types/game";
 export function GameDetails() {
   const { gameId } = gameRoute.useParams();
   const query = useGame(gameId);
-  const related = useGames({ category: query.data?.category });
+  const related = useGames({
+    category: categories.find((category) => category === query.data?.category),
+  });
   const { favorites, toggle } = useFavorites();
   const game = query.data;
   const saved = favorites.includes(gameId);
@@ -41,7 +44,10 @@ export function GameDetails() {
               <span>{game.name}</span>
             </div>
             <div className="detail-content">
-              <div className="eyebrow">{game.category} · JOGO FICTÍCIO</div>
+              <div className="eyebrow">
+                {game.category} ·{" "}
+                {game.source === "rawg" ? "RAWG" : "JOGO FICTÍCIO"}
+              </div>
               <h1>{game.name}</h1>
               <p>{game.description}</p>
               <dl>
@@ -51,18 +57,26 @@ export function GameDetails() {
                     Lançamento
                   </dt>
                   <dd>
-                    {new Intl.DateTimeFormat("pt-BR", {
-                      dateStyle: "long",
-                      timeZone: "UTC",
-                    }).format(new Date(game.releaseDate))}
+                    {game.releaseDate
+                      ? new Intl.DateTimeFormat("pt-BR", {
+                          dateStyle: "long",
+                          timeZone: "UTC",
+                        }).format(new Date(game.releaseDate))
+                      : "Não informada"}
                   </dd>
                 </div>
                 <div>
                   <dt>
                     <Flame size={17} />
-                    Popularidade fictícia
+                    {game.source === "rawg"
+                      ? "Avaliação RAWG"
+                      : "Popularidade fictícia"}
                   </dt>
-                  <dd>{game.popularity}%</dd>
+                  <dd>
+                    {game.source === "rawg"
+                      ? `${game.rating ?? 0} / 5`
+                      : `${game.popularity}%`}
+                  </dd>
                 </div>
               </dl>
               <Button onClick={() => toggle(gameId)} aria-pressed={saved}>
@@ -70,18 +84,24 @@ export function GameDetails() {
                 {saved ? "Remover dos favoritos" : "Adicionar aos favoritos"}
               </Button>
               <p className="detail-note">
-                Catálogo demonstrativo. Os jogos não são executáveis.
+                {game.source === "rawg"
+                  ? "Dados da RAWG. Descrições podem estar em inglês. Os jogos não são executados neste site."
+                  : "Catálogo demonstrativo. Os jogos não são executáveis."}
               </p>
             </div>
           </div>
           <section>
             <div className="section-heading">
               <h2>Continue explorando</h2>
-              <span>Mais jogos de {game.category}</span>
+              <span>
+                {categories.some((category) => category === game.category)
+                  ? `Mais jogos de ${game.category}`
+                  : "Outras descobertas para você"}
+              </span>
             </div>
             <GameGrid
-              games={related.data
-                ?.filter((item) => item.id !== gameId)
+              games={related.data?.games
+                .filter((item) => item.id !== gameId)
                 .slice(0, 4)}
               loading={related.isPending}
               error={related.isError}

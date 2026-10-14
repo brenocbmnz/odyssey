@@ -88,15 +88,15 @@ describe("Odyssey", () => {
     ).toBeVisible();
   });
   it("API combina categoria, busca e ordenação e retorna 404", async () => {
-    const games = await fetchGames({ category: "Puzzle", sort: "name" });
+    const { games } = await fetchGames({ category: "Puzzle", sort: "name" });
     expect(games).toHaveLength(5);
     expect(games.every((game) => game.category === "Puzzle")).toBe(true);
     expect(games.map((game) => game.name)).toEqual(
       games.map((game) => game.name).sort((a, b) => a.localeCompare(b)),
     );
-    expect(await fetchGames({ search: "neon", category: "Puzzle" })).toEqual(
-      [],
-    );
+    expect(
+      (await fetchGames({ search: "neon", category: "Puzzle" })).games,
+    ).toEqual([]);
     await expect(fetchGame("nao-existe")).rejects.toMatchObject({
       response: { status: 404 },
     });

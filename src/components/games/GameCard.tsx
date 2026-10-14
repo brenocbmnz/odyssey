@@ -17,6 +17,10 @@ export function GameCard({ game }: { game: Game }) {
             src={game.image}
             alt={`Ilustração de ${game.name}`}
             loading="lazy"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = "/art/game-0.svg";
+            }}
           />
           <span className="art-title">{game.name}</span>
         </Link>
@@ -33,7 +37,10 @@ export function GameCard({ game }: { game: Game }) {
         <div className="card-meta">
           <span>{game.category}</span>
           <span>
-            <Flame size={13} /> {game.popularity}%
+            <Flame size={13} />{" "}
+            {game.source === "rawg"
+              ? `${game.rating ?? 0}/5`
+              : `${game.popularity}%`}
           </span>
         </div>
         <Link

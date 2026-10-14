@@ -21,10 +21,14 @@ export const handlers = [
       params.get("sort") === "name"
         ? a.name.localeCompare(b.name)
         : params.get("sort") === "release"
-          ? b.releaseDate.localeCompare(a.releaseDate)
+          ? (b.releaseDate ?? "").localeCompare(a.releaseDate ?? "")
           : b.popularity - a.popularity,
     );
-    return HttpResponse.json(result);
+    return HttpResponse.json({
+      games: result,
+      total: result.length,
+      hasMore: false,
+    });
   }),
   http.get("/api/games/:id", async ({ params }) => {
     await delay(200);

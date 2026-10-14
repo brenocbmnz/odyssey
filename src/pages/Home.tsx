@@ -14,10 +14,12 @@ import { useGames } from "../hooks/useGames";
 import { GameGrid } from "../components/games/GameGrid";
 import { Button } from "../components/ui/button";
 import { categories } from "../types/game";
+import { isRawg } from "../config/source";
 const icons = [Zap, Puzzle, Castle, Map, Coffee];
 export function Home() {
   const popular = useGames({ sort: "popularity" });
   const recent = useGames({ sort: "release" });
+  const featured = popular.data?.games[0];
   return (
     <>
       <div className="page-heading">
@@ -35,39 +37,78 @@ export function Home() {
         </div>
         <span className="collection-badge">
           <span className="online-dot" />
-          25 jogos para descobrir
+          {isRawg ? "Jogos reais para descobrir" : "25 jogos para descobrir"}
         </span>
       </div>
-      <section className="hero" aria-label="Jogo em destaque">
+      <section
+        className={`hero ${isRawg ? "rawg-hero" : ""}`}
+        aria-label="Jogo em destaque"
+      >
         <img
-          src="/art/hero.svg"
-          alt="Paisagem espacial com montanhas neon e um planeta roxo"
+          src={isRawg ? (featured?.image ?? "/art/hero.svg") : "/art/hero.svg"}
+          alt={
+            isRawg
+              ? `Capa de ${featured?.name ?? "jogo em destaque"}`
+              : "Paisagem espacial com montanhas neon e um planeta roxo"
+          }
         />
         <div className="hero-content">
           <span className="featured-tag">
             <Sparkles size={13} />
-            DESTAQUE DA SEMANA
+            {isRawg ? "DESTAQUE DO CATÁLOGO" : "DESTAQUE DA SEMANA"}
           </span>
           <h2>
-            Neon
-            <br />
-            Odyssey
+            {isRawg ? (
+              (featured?.name ?? "Descubra novos mundos")
+            ) : (
+              <>
+                Neon
+                <br />
+                Odyssey
+              </>
+            )}
           </h2>
           <p>
-            Além do horizonte, uma nova aventura.
-            <br />
-            Explore um universo onde tudo é possível.
+            {isRawg ? (
+              "Conheça uma das grandes descobertas do catálogo."
+            ) : (
+              <>
+                Além do horizonte, uma nova aventura.
+                <br />
+                Explore um universo onde tudo é possível.
+              </>
+            )}
           </p>
           <div className="hero-meta">
-            <span>Arcade</span>
-            <span>★ 98% de popularidade</span>
+            <span>
+              {isRawg ? (featured?.category ?? "Jogos reais") : "Arcade"}
+            </span>
+            <span>
+              {isRawg
+                ? `★ ${featured?.rating ?? 0}/5 na RAWG`
+                : "★ 98% de popularidade"}
+            </span>
           </div>
-          <Button asChild>
-            <Link to="/games/$gameId" params={{ gameId: "1" }}>
-              Conhecer o jogo
-              <ArrowUpRight size={17} />
-            </Link>
-          </Button>
+          {!isRawg || featured ? (
+            <Button asChild>
+              <Link
+                to="/games/$gameId"
+                params={{ gameId: featured?.id ?? "1" }}
+              >
+                Conhecer o jogo
+                <ArrowUpRight size={17} />
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link
+                to="/catalog"
+                search={{ q: "", category: "", sort: "popularity" }}
+              >
+                Explorar catálogo
+              </Link>
+            </Button>
+          )}
         </div>
         <div className="hero-index">
           <span>01</span> / 01 — EM DESTAQUE
@@ -93,7 +134,7 @@ export function Home() {
                 </span>
                 <div>
                   <strong>{category}</strong>
-                  <small>5 jogos</small>
+                  <small>{isRawg ? "Explorar gênero" : "5 jogos"}</small>
                 </div>
                 <ArrowUpRight size={15} />
               </Link>
@@ -119,7 +160,7 @@ export function Home() {
           </Link>
         </div>
         <GameGrid
-          games={popular.data?.slice(0, 4)}
+          games={popular.data?.games.slice(0, 4)}
           loading={popular.isPending}
           error={popular.isError}
           retry={() => void popular.refetch()}
@@ -140,7 +181,7 @@ export function Home() {
           </Link>
         </div>
         <GameGrid
-          games={recent.data?.slice(0, 4)}
+          games={recent.data?.games.slice(0, 4)}
           loading={recent.isPending}
           error={recent.isError}
           retry={() => void recent.refetch()}

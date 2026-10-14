@@ -1,6 +1,8 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
+  testMatch:
+    process.env.E2E_SOURCE === "rawg" ? "rawg.spec.ts" : "gamehub.spec.ts",
   use: { baseURL: "http://127.0.0.1:4173" },
   webServer: {
     command: "npm run preview -- --host 127.0.0.1",

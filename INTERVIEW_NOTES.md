@@ -26,7 +26,7 @@ Cada consulta tem uma chave. `['games', { category: 'Puzzle', sort: 'name' }]` r
 
 ## Como os favoritos são salvos?
 
-O contexto mantém uma lista de IDs. O módulo de armazenamento lê e grava JSON em uma chave versionada. Na inicialização, ele valida que há uma lista de strings e tolera JSON corrompido. Ao alternar um favorito, o estado da interface e o localStorage são atualizados. O evento `storage` sincroniza outras abas. Se o armazenamento estiver bloqueado, a sessão continua funcionando e o usuário recebe feedback. Esse mecanismo é local ao navegador, sem conta ou sincronização entre dispositivos.
+O contexto mantém uma lista de IDs. O módulo de armazenamento lê e grava JSON em uma chave versionada. Na inicialização, ele valida que há uma lista de strings e tolera JSON corrompido. Ao alternar um favorito, o estado da interface e o localStorage são atualizados. O evento `storage` sincroniza outras abas. Se o armazenamento estiver bloqueado, a sessão continua funcionando e o usuário recebe feedback. Esse mecanismo é local ao navegador, sem conta ou sincronização entre dispositivos. As coleções demo e RAWG usam chaves distintas para evitar que um ID fictício se torne outro jogo real. Na página de favoritos, cada ID é consultado individualmente; por isso jogos de outras páginas do catálogo continuam visíveis.
 
 ## Como a API funciona sem backend?
 
@@ -45,7 +45,7 @@ A home organiza descoberta: destaque, estilos, populares e novidades. O catálog
 | Situação                                 | Como abordar                                                                     |
 | ---------------------------------------- | -------------------------------------------------------------------------------- |
 | API responde fora de ordem durante busca | Chaves por filtros e AbortSignal separam e cancelam consultas                    |
-| Digitação gera muitas requisições        | Para dados maiores, incluir debounce e paginação; aqui o catálogo é pequeno      |
+| Digitação gera muitas requisições        | Busca com debounce de 350ms e catálogo RAWG paginado, 24 jogos por página        |
 | Link direto retorna 404 no hosting       | Rewrite da SPA no `vercel.json`                                                  |
 | MSW não inicia em produção               | Manter bootstrap incondicional, servir o worker e usar HTTPS                     |
 | localStorage corrompido ou bloqueado     | Validar entrada, tratar exceções e informar falha de persistência                |
@@ -56,4 +56,12 @@ A home organiza descoberta: destaque, estilos, populares e novidades. O catálog
 
 ## Limites para explicar com transparência
 
-É um catálogo funcional de demonstração, sem execução de jogos, login, pagamentos ou backend. Imagens, métricas e datas são locais e fictícias. Não há paginação porque existem apenas 25 itens. A persistência é local. A arquitetura já permite trocar os serviços por uma API real; autenticação e autorização exigiriam projeto adicional.
+É um catálogo funcional de demonstração, sem execução de jogos, login, pagamentos ou backend. No demo, imagens, métricas e datas são locais e fictícias. No modo RAWG, os dados são reais, externos e paginados; descrições podem estar em inglês. A persistência é local. A arquitetura já permite trocar os serviços por uma API real; autenticação e autorização exigiriam projeto adicional.
+
+## Integração real com RAWG
+
+O modo real mantém o contrato do front-end e substitui MSW por duas funções serverless. Elas consultam a RAWG com uma chave privada. O Vite também oferece esse proxy no desenvolvimento. `RAWG_API_KEY` é lida no servidor; `VITE_GAME_SOURCE` seleciona o modo no build. Variáveis `VITE_*` são públicas, portanto nunca devem conter o segredo.
+
+O proxy traduz gêneros e ordenação, normaliza cards e detalhes e converte links de paginação em `hasMore`. Isso impede vazar a chave que poderia estar embutida em `next`. Só respostas bem-sucedidas recebem cache compartilhado. O catálogo real é ordenado por adições na RAWG, não por jogadores simultâneos; a nota exibida é de 0 a 5. Há atribuição à RAWG em todas as páginas.
+
+Os testes do proxy substituem a resposta upstream por fixtures e verificam erro, paginação, parâmetros e não exposição da chave. Os testes de navegador do modo real verificam favoritos além da primeira página e ausência de MSW, sem consumir a cota pessoal. Validar uma chave real exige configurá-la no ambiente e fazer a verificação na aplicação.

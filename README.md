@@ -1,109 +1,135 @@
 # Odyssey
 
-Plataforma de descoberta de jogos fictícios desenvolvida para apresentação técnica de front-end. Interface em português, tema escuro, ilustrações SVG originais e locais, 25 jogos distribuídos em cinco categorias. Não há jogos executáveis, apostas, autenticação ou backend real.
+Catálogo de jogos com React, TypeScript estrito, Vite e Tailwind CSS. Possui dois modos: **demo**, com 25 jogos locais e MSW, e **RAWG**, com jogos reais, capas, gêneros, descrições e avaliações. Inclui home, busca, filtros, ordenação, paginação, detalhes e favoritos persistidos.
 
 ## Executar
 
-Requer Node.js 22.12+ e npm. O arquivo `package-lock.json` fixa as versões resolvidas.
+Requer Node.js 22.12+ e npm.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abra a URL exibida pelo Vite. Para validar a versão de produção:
+Sem configuração, o modo demo funciona sem chave e sem API externa.
 
-```bash
-npm run build
-npm run preview
+## Ativar a RAWG localmente
+
+Copie `.env.example` para `.env.local` e preencha:
+
+```dotenv
+VITE_GAME_SOURCE=rawg
+RAWG_API_KEY=sua_chave_aqui
 ```
 
-| Comando              | Função                                            |
-| -------------------- | ------------------------------------------------- |
-| `npm run dev`        | Servidor de desenvolvimento                       |
-| `npm run build`      | TypeScript estrito e build de produção            |
-| `npm run preview`    | Servir o build localmente                         |
-| `npm run typecheck`  | Verificação de tipos                              |
-| `npm run lint`       | ESLint, regras de hooks e proibição de `any`      |
-| `npm test`           | Vitest e React Testing Library                    |
-| `npm run test:e2e`   | Playwright no build de produção, desktop e mobile |
-| `npm run test:watch` | Testes em modo interativo                         |
-| `npm run format`     | Formatar código e documentos                      |
+Reinicie `npm run dev`. O middleware do Vite responde aos endpoints `/api/games` e consulta a RAWG no servidor. A chave **não** entra no bundle do front-end. `.env.local` e os demais arquivos de segredo estão ignorados pelo Git.
 
-## Recursos
+Nunca use `VITE_RAWG_API_KEY`: variáveis com prefixo `VITE_` são públicas. `VITE_GAME_SOURCE` é apenas uma seleção de modo e pode ser pública.
 
-- Home com destaque, categorias, jogos populares e recentes.
-- Catálogo com busca por nome, categoria e ordenação por popularidade, nome e lançamento.
-- Filtros persistidos na URL; links compartilháveis e histórico de navegação.
-- Rotas individuais de detalhes, metadados, favoritos e jogos relacionados.
-- Favoritos persistidos no navegador, sincronizados entre abas. Dados corrompidos são tratados; bloqueio do armazenamento gera feedback.
-- Skeletons, tratamento de erro com refetch, estados vazios e página não encontrada.
-- Sidebar em desktop, menu móvel, grid responsivo, foco visível, link para pular ao conteúdo, feedback acessível e respeito à redução de movimento.
+## Ativar a RAWG na Vercel
+
+1. Importe o repositório GitHub. Use preset **Vite**, Node.js **22.x**, instalação `npm ci`, build `npm run build` e saída `dist`.
+2. Em **Settings → Environment Variables**, adicione:
+
+| Nome               | Valor          | Uso                        |
+| ------------------ | -------------- | -------------------------- |
+| `RAWG_API_KEY`     | Sua chave RAWG | Apenas funções no servidor |
+| `VITE_GAME_SOURCE` | `rawg`         | Seleção pública do modo    |
+
+3. Selecione **Production** e, se quiser usar a API nos previews, **Preview**. Não publique a chave no GitHub.
+4. Faça **Redeploy** depois de salvar. A seleção do modo é aplicada durante o build.
+5. Confira a home e busque um jogo. Abra os detalhes, favorite, recarregue e veja `/favorites`.
+
+As funções em `api/games.ts` e `api/games/[id].ts` são detectadas pela Vercel. O `vercel.json` preserva `/api` e os assets e redireciona as rotas da SPA. Para voltar ao demo, defina `VITE_GAME_SOURCE=demo` e faça novo deploy.
+
+`npm run preview` serve apenas o build estático, sem executar funções. Para testar a RAWG localmente, use `npm run dev`; para conferir o hosting com funções, use a Vercel. Nenhuma chave real é necessária nos testes automatizados.
+
+## Funcionalidades e dados
+
+- Home com destaque dinâmico, populares, novidades e categorias.
+- Busca por nome com debounce de 350ms, filtros e ordenação na URL.
+- Catálogo real paginado com 24 jogos por página; demo com 25 jogos.
+- Detalhes, avaliação RAWG de 0 a 5 e tratamento de datas/imagens ausentes.
+- Favoritos carregados individualmente, inclusive de outras páginas do catálogo.
+- Favoritos separados por fonte para evitar colisão entre IDs fictícios e reais. A chave do demo foi preservada para manter coleções existentes.
+- Skeletons, erros com tentativa novamente, estados vazios e 404.
+- Layout responsivo, labels, foco visível, navegação por teclado, feedback acessível e redução de movimento.
+- Atribuição e link à RAWG em todas as páginas no modo real.
+
+No modo RAWG, os filtros usam Ação, Puzzle, Estratégia, Aventura e Casual. Os jogos podem exibir outros gêneros recebidos da API. Um jogo com vários gêneros pode aparecer no filtro de Puzzle e exibir seu primeiro gênero no card. Popularidade significa quantidade de adições na RAWG (`added`), não número de jogadores da Steam. Novidades são ordenadas por lançamento, limitadas a datas até hoje. A avaliação é a nota RAWG; descrições podem estar em inglês. O site não executa jogos.
 
 ## Arquitetura
 
 ```text
-src/
-  components/ui/        Button composicional no padrão shadcn/ui
-  components/layout/    Sidebar, header, estrutura e navegação
-  components/games/     Card e grid com estados de carregamento/erro
-  pages/                Home, catálogo, detalhes e favoritos
-  routes/               TanStack Router e validação de search params
-  hooks/                Consultas reutilizáveis
-  services/             Axios e contratos de requisição
-  mocks/                Dados, handlers REST e worker do navegador
-  types/                Game, Category, Sort e GameFilters
-  contexts/             Estado e ações de favoritos
-  utils/                Encapsulamento de localStorage
-  test/                 Integração e configuração de testes
-public/art/             Ilustrações SVG locais
+api/                    Entradas das funções Vercel
+server/rawg.ts          Proxy, filtros, normalização e erros upstream
+src/config/             Seleção demo/RAWG
+src/components/ui/      Button no padrão shadcn/ui com Radix e CVA
+src/components/layout/  Sidebar, header, navegação e atribuição
+src/components/games/   Cards e grid
+src/pages/              Home, catálogo, detalhes e favoritos
+src/routes/             TanStack Router e validação de URL
+src/hooks/              Consultas e favoritos remotos
+src/services/           Axios e contrato da API
+src/mocks/              Dados, REST handlers e worker MSW
+src/types/              Tipos e interfaces
+src/contexts/           Estado de favoritos
+src/utils/              Persistência local
+src/test/               Testes de integração React
+server/rawg.test.ts     Testes do proxy com respostas controladas
+e2e/                    Testes de navegador nos dois modos
+public/art/             Ilustrações locais do demo e fallback
 ```
 
-React e TypeScript estrito compõem a interface. Tailwind CSS v4 é integrado pelo plugin oficial do Vite; CSS dedicado expressa a identidade visual. Lucide fornece ícones. O Button segue o padrão composicional do shadcn/ui com Radix Slot, CVA e tailwind-merge e é mantido no projeto, sem dependência de um pacote de componentes opaco.
+Axios envia requisições à API do próprio site. TanStack Query gerencia cache, loading, erro, retry e cancelamento. As chaves incluem filtros e página. O staleTime é 60 segundos. Um contexto cuida dos favoritos locais, sincronizados entre abas. O catálogo usa TanStack Router e o Button segue o padrão composicional do shadcn/ui.
 
-TanStack Router usa rotas declaradas em código, suficientes para este tamanho de aplicação. A URL é a fonte dos filtros do catálogo. Axios fica restrito à camada de serviços. TanStack Query controla estado remoto; o contexto cuida apenas dos favoritos locais. Cards não fazem requisições.
+## API e segurança da chave
 
-## API simulada
+```text
+React → /api/games → servidor Vercel → RAWG
+```
 
-O MSW intercepta requisições reais do Axios, sem um servidor próprio:
+- `GET /api/games?search=portal&category=Puzzle&sort=popularity&page=1`
+- `GET /api/games/:id`
 
-- `GET /api/games?search=neon&category=Arcade&sort=popularity`
-- `GET /api/games/:id` (404 para ID inexistente)
+A listagem retorna `{ games, total, hasMore }`. O servidor usa origem fixa, valida parâmetros, limita o tamanho da busca e aplica timeout. Ele normaliza os dados e não repassa `next`/`previous` da RAWG, porque essas URLs podem conter a chave. Respostas bem-sucedidas possuem cache de CDN de 5 minutos; falhas não são armazenadas por essa política.
 
-`search` é insensível a maiúsculas e diacríticos. `sort` aceita `name`, `popularity` e `release`. A latência artificial permite observar skeletons. Todos os dados são locais e fictícios.
+Os endpoints são públicos para permitir navegação sem login. O cache e o debounce reduzem chamadas, mas não substituem um limite de uso contra abuso; configure proteção adicional de tráfego na Vercel se necessário e acompanhe a cota RAWG.
 
-O worker inicia **antes** do React tanto em desenvolvimento quanto em produção, sem condicionamento a `import.meta.env.DEV`. `public/mockServiceWorker.js` entra no build. MSW v3 usa a opção `onUnhandledFrame: 'bypass'` para requisições fora da API. É necessário HTTPS ou localhost e suporte a Service Worker. Falhas de inicialização mostram uma mensagem e opção de recarregar.
+O modo demo usa MSW antes da renderização em desenvolvimento e produção. No modo real, ele não inicia. Os dados fictícios não substituem silenciosamente uma falha da API real. Um worker de demo anterior é desregistrado durante a inicialização no modo real.
 
-As consultas têm `staleTime` de 60 segundos. A chave inclui os filtros, impedindo mistura de resultados. Uma falha é repetida uma vez; o botão de erro executa refetch. AbortSignal permite cancelamento de requisições. A chave foi mantida para preservar favoritos de versões anteriores. Favoritos usam a chave versionada `gamehub:favorites:v1`; localStorage não é banco de dados nem sincroniza dispositivos.
+## Comandos e validação
 
-## Testes
+| Comando              | Função                                      |
+| -------------------- | ------------------------------------------- |
+| `npm run dev`        | Desenvolvimento, incluindo proxy local RAWG |
+| `npm run build`      | TypeScript estrito e build de produção      |
+| `npm run preview`    | Servir o build estático                     |
+| `npm run lint`       | ESLint                                      |
+| `npm run typecheck`  | TypeScript, incluindo funções do servidor   |
+| `npm test`           | Integração React e proxy RAWG               |
+| `npm run test:watch` | Testes em modo interativo                   |
+| `npm run test:e2e`   | Fluxos do demo, desktop e mobile            |
+| `npm run format`     | Formatar fontes e documentos                |
 
-Os testes usam os mesmos handlers REST no MSW Node. Cobrem renderização de cards, busca e estado vazio, favoritos após remontagem, remoção, falha HTTP e recuperação, filtros/ordenação da API, 404 e armazenamento inválido. Cada teste usa cache isolado, limpa o DOM e restaura os handlers.
+Para os testes de navegador, instale `npx playwright install chromium`. Para testar demo, faça build com `VITE_GAME_SOURCE=demo` e rode `npm run test:e2e`. Para testar o modo real sem consumir a chave, execute:
 
-Para os testes de navegador, execute `npx playwright install chromium`, depois `npm run build` e `npm run test:e2e`. O Playwright inicia e encerra o servidor de preview. Os fluxos verificam o MSW de produção, navegação, busca, filtros, favoritos após reload e ausência de overflow horizontal em 1440px e 390px.
+```bash
+VITE_GAME_SOURCE=rawg npm run build
+E2E_SOURCE=rawg npm run test:e2e
+```
 
-## Publicar na Vercel
+Os testes RAWG de navegador interceptam `/api/games` com fixtures: validam interface e fluxo sem consumir cota. Os testes do proxy verificam filtros, detalhes, paginação, falta de chave, falhas, timeout e ausência de segredo nas respostas. A validação com a chave pessoal ocorre após configurar o ambiente.
 
-1. Envie este projeto para um repositório Git e importe-o na Vercel.
-2. Selecione o preset Vite, Node.js 22 ou superior, comando `npm run build` e saída `dist`.
-3. Use `npm ci` para instalar as versões do lockfile. Nenhuma variável de ambiente é necessária.
-4. Publique. O `vercel.json` redireciona rotas de navegação ao `index.html`, preservando os arquivos de assets e o worker.
-5. Confira a home, abra diretamente `/games/1`, recarregue `/favorites` e teste um filtro. Verifique que `/mockServiceWorker.js` retorna JavaScript e que as consultas aparecem como interceptadas pelo Service Worker.
+## Limitações e evolução
 
-Não é necessário criar funções serverless para `/api`: o MSW responde no navegador. Este projeto foi preparado para publicação; nenhuma conta externa foi usada para publicar automaticamente.
+A integração RAWG acrescenta duas funções serverless ao escopo originalmente apenas front-end. A API externa precisa de internet, chave válida e cota disponível. Dados e imagens são de terceiros; filtros disponíveis são uma seleção de gêneros. Favoritos são locais ao navegador, sem conta ou sincronização entre dispositivos. O projeto aplica práticas de acessibilidade, sem declarar certificação WCAG.
 
-## Decisões e evolução
-
-A aplicação prioriza funções verificáveis e separação simples de responsabilidades. As ilustrações locais garantem funcionamento sem APIs ou CDNs externos. O dark mode concentra a identidade em roxo e ciano com tipografia legível e animações discretas.
-
-Melhorias futuras: debounce para catálogos maiores, paginação, virtualização, auditoria automatizada com axe, testes E2E em navegadores distintos, internacionalização e integração com API real. Trocar a API exige substituir a base Axios e desativar o worker; as páginas podem manter seus contratos.
-
-O projeto inclui práticas de acessibilidade, mas não declara certificação WCAG: uma auditoria completa com tecnologias assistivas ainda é recomendável.
+Evoluções possíveis: busca por plataforma/loja, validação de payloads por schema, limite de tráfego, sincronização de favoritos, internacionalização e auditoria com leitores de tela.
 
 ## Referências oficiais
 
-- [Vite](https://vite.dev/guide/)
-- [Tailwind CSS com Vite](https://tailwindcss.com/docs/installation/using-vite)
-- [TanStack Router: rotas em código](https://tanstack.com/router/latest/docs/routing/code-based-routing)
-- [TanStack Query: useQuery](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)
-- [MSW: integração com navegador](https://mswjs.io/guides/integrations/browser)
+- [RAWG: chave, dados e atribuição](https://rawg.io/apidocs)
+- [Vercel: funções Node.js](https://vercel.com/docs/functions/runtimes/node-js)
+- [Vite na Vercel](https://vercel.com/docs/frameworks/frontend/vite)
+- [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)

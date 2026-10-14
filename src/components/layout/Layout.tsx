@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFavorites } from "../../contexts/FavoritesContext";
+import { isRawg } from "../../config/source";
 export function Layout() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -108,7 +109,12 @@ export function Layout() {
           </div>
           <div className="demo-note">
             <span className="online-dot" />
-            Ambiente de demonstração<small>Jogos e dados fictícios</small>
+            {isRawg ? "Catálogo conectado" : "Ambiente de demonstração"}
+            <small>
+              {isRawg
+                ? "Dados fornecidos pela RAWG"
+                : "Jogos e dados fictícios"}
+            </small>
           </div>
         </div>
       </aside>
@@ -146,7 +152,7 @@ export function Layout() {
             </button>
           </form>
           <div className="header-right">
-            <span className="demo-badge">DEMO</span>
+            <span className="demo-badge">{isRawg ? "RAWG" : "DEMO"}</span>
             <span className="avatar" aria-label="Perfil de visitante">
               OD
             </span>
@@ -156,7 +162,23 @@ export function Layout() {
           <Outlet />
         </main>
         <footer>
-          <span>© 2026 Odyssey</span>
+          <span>
+            © 2026 Odyssey
+            {isRawg && (
+              <>
+                {" "}
+                · Dados e imagens:{" "}
+                <a
+                  href="https://rawg.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="purple"
+                >
+                  RAWG
+                </a>
+              </>
+            )}
+          </span>
           <span>
             Feito para quem ama descobrir jogos.
             <span className="footer-dot">✦</span>

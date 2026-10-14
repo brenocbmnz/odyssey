@@ -1,4 +1,5 @@
-const key = "gamehub:favorites:v1";
+import { isRawg } from "../config/source";
+const key = isRawg ? "odyssey:favorites:rawg:v1" : "gamehub:favorites:v1";
 export function readFavorites(): string[] {
   try {
     const value: unknown = JSON.parse(localStorage.getItem(key) ?? "[]");

@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { Button } from "../components/ui/button";
+import { isRawg } from "../config/source";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { catalogRoute } from "../routes/router";
@@ -16,7 +19,21 @@ export function Catalog() {
       replace: true,
     });
   };
-  const query = useGames({ search: q, category: category || undefined, sort });
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState(q);
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(q), 350);
+    return () => clearTimeout(timer);
+  }, [q]);
+  useEffect(() => {
+    setPage(1);
+  }, [q, category, sort]);
+  const query = useGames({
+    search,
+    category: category || undefined,
+    sort,
+    page,
+  });
   return (
     <>
       <div className="page-heading">
@@ -25,7 +42,11 @@ export function Catalog() {
           <h1>
             Catálogo de jogos<span className="purple-dot">.</span>
           </h1>
-          <p>25 universos originais. Qual vai ser sua próxima aventura?</p>
+          <p>
+            {isRawg
+              ? "Descubra jogos reais, explore gêneros e encontre sua próxima aventura."
+              : "25 universos originais. Qual vai ser sua próxima aventura?"}
+          </p>
         </div>
       </div>
       <div className="filters">
@@ -67,7 +88,7 @@ export function Catalog() {
         <span role="status">
           {query.isPending
             ? "Buscando jogos..."
-            : `${query.data?.length ?? 0} jogos encontrados`}
+            : `${query.data?.total ?? 0} jogos encontrados`}
         </span>
         {(q || category) && (
           <button onClick={() => update({ q: "", category: "" })}>
@@ -77,11 +98,30 @@ export function Catalog() {
         )}
       </div>
       <GameGrid
-        games={query.data}
+        games={query.data?.games}
         loading={query.isPending}
         error={query.isError}
         retry={() => void query.refetch()}
       />
+      {!query.isPending && !query.isError && isRawg && (
+        <div className="pagination">
+          <Button
+            variant="outline"
+            disabled={page === 1}
+            onClick={() => setPage((value) => value - 1)}
+          >
+            Anterior
+          </Button>
+          <span role="status">Página {page}</span>
+          <Button
+            variant="outline"
+            disabled={!query.data?.hasMore}
+            onClick={() => setPage((value) => value + 1)}
+          >
+            Próxima
+          </Button>
+        </div>
+      )}
     </>
   );
 }
