@@ -24,6 +24,17 @@ test.beforeEach(async ({ page }) => {
     );
 });
 async function audit(page: Page) {
+  await expect
+    .poll(() =>
+      page
+        .locator("html")
+        .evaluate((node) =>
+          node
+            .getAnimations()
+            .every((animation) => animation.playState === "finished"),
+        ),
+    )
+    .toBe(true);
   if (await page.locator(".carousel-copy").count())
     await expect
       .poll(() =>
@@ -146,4 +157,19 @@ test("idioma persistido, conteúdo traduzido, foco e auditoria ARIA/WCAG", async
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+});
+
+test("temas claro e noturno: persistência e contraste", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/");
+  await expect(page.locator(".game-card").first()).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Ativar modo claro" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await audit(page);
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.getByRole("button", { name: "Ativar modo noturno" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await audit(page);
 });

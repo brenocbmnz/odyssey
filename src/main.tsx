@@ -1,3 +1,4 @@
+import { ThemeProvider, initializeTheme } from "./contexts/ThemeContext";
 import { StartupError } from "./pages/RouteErrors";
 import { LanguageProvider } from "./i18n/LanguageContext";
 import { StrictMode } from "react";
@@ -11,6 +12,7 @@ import { isRawg } from "./config/source";
 const client = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
 });
+initializeTheme();
 async function start() {
   if (!isRawg) {
     const { worker } = await import("./mocks/browser");
@@ -32,11 +34,13 @@ async function start() {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <QueryClientProvider client={client}>
-        <LanguageProvider>
-          <FavoritesProvider>
-            <RouterProvider router={router} />
-          </FavoritesProvider>
-        </LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <FavoritesProvider>
+              <RouterProvider router={router} />
+            </FavoritesProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>,
   );
@@ -45,9 +49,11 @@ void start().catch(() => {
   const root = document.getElementById("root");
   if (root) {
     createRoot(root).render(
-      <LanguageProvider>
-        <StartupError />
-      </LanguageProvider>,
+      <ThemeProvider>
+        <LanguageProvider>
+          <StartupError />
+        </LanguageProvider>
+      </ThemeProvider>,
     );
   }
 });

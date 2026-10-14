@@ -5,7 +5,7 @@ import {
 } from "../../utils/artwork";
 import { useState, useEffect, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Game } from "../../types/game";
 import { Button } from "../ui/button";
 import { useLanguage } from "../../i18n/LanguageContext";
@@ -71,6 +71,15 @@ export function FeaturedCarousel({
             : t("Jogo em destaque")
         }
       >
+        {game && (
+          <Link
+            className="carousel-game-link"
+            to="/games/$gameId"
+            params={{ gameId: game.id }}
+            aria-label={t("Conhecer o jogo")}
+            title={t("Ver detalhes de {name}", { name: game.name })}
+          />
+        )}
         <div className="carousel-artwork" aria-hidden="true">
           {(slides.length ? slides : [undefined]).map((slide, i) => {
             const original =
@@ -139,14 +148,7 @@ export function FeaturedCarousel({
                 </span>
               </div>
             )}
-            {game ? (
-              <Button asChild>
-                <Link to="/games/$gameId" params={{ gameId: game.id }}>
-                  {t("Conhecer o jogo")}
-                  <ArrowUpRight size={17} />
-                </Link>
-              </Button>
-            ) : (
+            {!game && (
               <Button asChild>
                 <Link
                   to="/catalog"

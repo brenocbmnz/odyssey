@@ -180,3 +180,30 @@ test("carrossel, sugestões por teclado, pesquisa completa e estados vazios", as
     ),
   ).toBe(true);
 });
+
+test("clicar na capa ou usar Enter abre o jogo em destaque", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const hero = page.getByRole("region", { name: "Jogos em destaque" });
+  await expect(hero.locator(".carousel-game-link")).toBeVisible();
+  const firstUrl = await hero
+    .locator(".carousel-game-link")
+    .getAttribute("href");
+  await hero
+    .locator(".carousel-game-link")
+    .click({ position: { x: 20, y: 20 } });
+  await expect(page).toHaveURL(new RegExp(`${firstUrl}$`));
+  await page.goto("/");
+  await hero.getByRole("button", { name: "Próximo destaque" }).click();
+  await expect(hero.locator(".carousel-game-link")).not.toHaveAttribute(
+    "href",
+    firstUrl!,
+  );
+  const nextUrl = await hero
+    .locator(".carousel-game-link")
+    .getAttribute("href");
+  await hero.locator(".carousel-game-link").focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`${nextUrl}$`));
+});

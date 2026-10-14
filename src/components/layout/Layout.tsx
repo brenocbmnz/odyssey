@@ -1,12 +1,22 @@
+import { useTheme } from "../../contexts/ThemeContext";
 import { SearchBar } from "./SearchBar";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Compass, Heart, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  Compass,
+  Heart,
+  Menu,
+  X,
+  Sun,
+  Moon,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import { isRawg } from "../../config/source";
 export function Layout() {
   const { t, locale, setLocale } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const { favorites, message } = useFavorites();
   const path = useRouterState({ select: (state) => state.location.pathname });
@@ -132,6 +142,29 @@ export function Layout() {
           </button>
           <SearchBar />
           <div className="header-right">
+            <button
+              type="button"
+              className="theme-toggle"
+              data-theme={theme}
+              onClick={toggleTheme}
+              aria-label={t(
+                theme === "dark" ? "Ativar modo claro" : "Ativar modo noturno",
+              )}
+              title={t(
+                theme === "dark" ? "Ativar modo claro" : "Ativar modo noturno",
+              )}
+            >
+              <Sun
+                size={18}
+                className="theme-icon theme-icon-sun"
+                aria-hidden="true"
+              />
+              <Moon
+                size={18}
+                className="theme-icon theme-icon-moon"
+                aria-hidden="true"
+              />
+            </button>
             <label className="language-control">
               <span className="sr-only">{t("Idioma")}</span>
               <select

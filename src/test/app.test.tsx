@@ -1,3 +1,4 @@
+import { ThemeProvider } from "../contexts/ThemeContext";
 import { LanguageProvider } from "../i18n/LanguageContext";
 import { describe, it, expect } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -19,11 +20,13 @@ async function renderApp(path: string) {
   });
   return render(
     <QueryClientProvider client={client}>
-      <LanguageProvider>
-        <FavoritesProvider>
-          <RouterProvider router={router} />
-        </FavoritesProvider>
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <FavoritesProvider>
+            <RouterProvider router={router} />
+          </FavoritesProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>,
   );
 }

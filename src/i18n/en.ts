@@ -163,6 +163,8 @@ export const english: Record<string, string> = {
   "Jogo adicionado aos favoritos.": "Game added to favorites.",
   "Favorito atualizado nesta sessão. O navegador não permitiu salvar.":
     "Favorite updated for this session. Your browser did not allow saving.",
+  "Ativar modo claro": "Switch to light mode",
+  "Ativar modo noturno": "Switch to dark mode",
   Idioma: "Language",
   Português: "Portuguese",
   Inglês: "English",
