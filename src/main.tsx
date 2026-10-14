@@ -1,3 +1,5 @@
+import { StartupError } from "./pages/RouteErrors";
+import { LanguageProvider } from "./i18n/LanguageContext";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
@@ -30,9 +32,11 @@ async function start() {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <QueryClientProvider client={client}>
-        <FavoritesProvider>
-          <RouterProvider router={router} />
-        </FavoritesProvider>
+        <LanguageProvider>
+          <FavoritesProvider>
+            <RouterProvider router={router} />
+          </FavoritesProvider>
+        </LanguageProvider>
       </QueryClientProvider>
     </StrictMode>,
   );
@@ -40,7 +44,10 @@ async function start() {
 void start().catch(() => {
   const root = document.getElementById("root");
   if (root) {
-    root.innerHTML =
-      '<main class="empty" role="alert"><h1>Não foi possível iniciar o Odyssey</h1><p>A API demonstrativa precisa de um navegador com Service Worker e de HTTPS ou localhost.</p><button onclick="location.reload()">Tentar novamente</button></main>';
+    createRoot(root).render(
+      <LanguageProvider>
+        <StartupError />
+      </LanguageProvider>,
+    );
   }
 });

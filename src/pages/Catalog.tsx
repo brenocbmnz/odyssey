@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/LanguageContext";
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { isRawg } from "../config/source";
@@ -8,6 +9,7 @@ import { useGames } from "../hooks/useGames";
 import { categories, type Category, type Sort } from "../types/game";
 import { GameGrid } from "../components/games/GameGrid";
 export function Catalog() {
+  const { t, locale } = useLanguage();
   const { q, category, sort } = catalogRoute.useSearch();
   const navigate = useNavigate();
   const update = (
@@ -38,14 +40,17 @@ export function Catalog() {
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">DESCUBRA ALGO NOVO</div>
+          <div className="eyebrow">{t("DESCUBRA ALGO NOVO")}</div>
           <h1>
-            Catálogo de jogos<span className="purple-dot">.</span>
+            {t("Catálogo de jogos")}
+            <span className="purple-dot">.</span>
           </h1>
           <p>
             {isRawg
-              ? "Descubra jogos reais, explore gêneros e encontre sua próxima aventura."
-              : "25 universos originais. Qual vai ser sua próxima aventura?"}
+              ? t(
+                  "Descubra jogos reais, explore gêneros e encontre sua próxima aventura.",
+                )
+              : t("25 universos originais. Qual vai ser sua próxima aventura?")}
           </p>
         </div>
       </div>
@@ -53,74 +58,85 @@ export function Catalog() {
         <label className="catalog-search">
           <Search size={18} />
           <input
-            aria-label="Buscar por nome"
-            placeholder="Buscar por nome..."
+            aria-label={t("Buscar por nome")}
+            placeholder={t("Buscar por nome...")}
             value={q}
             onChange={(event) => update({ q: event.target.value })}
           />
         </label>
         <label className="sort-control">
           <SlidersHorizontal size={16} />
-          <span className="sr-only">Ordenar jogos</span>
+          <span className="sr-only">{t("Ordenar jogos")}</span>
           <select
             value={sort}
             onChange={(event) => update({ sort: event.target.value as Sort })}
           >
-            <option value="popularity">Mais populares</option>
-            <option value="name">Nome: A–Z</option>
-            <option value="release">Mais recentes</option>
+            <option value="popularity">{t("Mais populares")}</option>
+            <option value="name">{t("Nome: A–Z")}</option>
+            <option value="release">{t("Mais recentes")}</option>
           </select>
         </label>
       </div>
-      <div className="filter-tabs" aria-label="Filtrar por categoria">
+      <div
+        className="filter-tabs"
+        role="group"
+        aria-label={t("Filtrar por categoria")}
+      >
         {["", ...categories].map((item) => (
           <button
             key={item}
             aria-pressed={category === item}
+            aria-controls="catalog-results"
             className={category === item ? "selected" : ""}
             onClick={() => update({ category: item as Category | "" })}
           >
-            {item || "Todos os jogos"}
+            {t(item || "Todos os jogos")}
           </button>
         ))}
       </div>
       <div className="results-bar">
-        <span role="status">
+        <span role="status" aria-atomic="true">
           {query.isPending
-            ? "Buscando jogos..."
-            : `${query.data?.total ?? 0} jogos encontrados`}
+            ? t("Buscando jogos...")
+            : t("{count} jogos encontrados", {
+                count: new Intl.NumberFormat(locale).format(
+                  query.data?.total ?? 0,
+                ),
+              })}
         </span>
         {(q || category) && (
           <button onClick={() => update({ q: "", category: "" })}>
             <X size={14} />
-            Limpar filtros
+            {t("Limpar filtros")}
           </button>
         )}
       </div>
       <GameGrid
+        label={t("Catálogo de jogos")}
+        id="catalog-results"
         games={query.data?.games}
         loading={query.isPending}
         error={query.isError}
         retry={() => void query.refetch()}
       />
       {!query.isPending && !query.isError && isRawg && (
-        <div className="pagination">
+        <nav className="pagination" aria-label={t("Paginação do catálogo")}>
           <Button
             variant="outline"
             disabled={page === 1}
             onClick={() => setPage((value) => value - 1)}
           >
-            Anterior
+            {t("Anterior")}
           </Button>
-          <span role="status">Página {page}</span>
+          <span aria-current="page">{t("Página {page}", { page })}</span>
           <Button
             variant="outline"
             disabled={!query.data?.hasMore}
             onClick={() => setPage((value) => value + 1)}
           >
-            Próxima
+            {t("Próxima")}
           </Button>
-        </div>
+        </nav>
       )}
     </>
   );

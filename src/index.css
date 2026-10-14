@@ -160,7 +160,7 @@ nav > a.nav-active {
 .discovery > svg {
   color: #bba0ff;
 }
-.discovery h3 {
+.discovery h2 {
   font-size: 14px;
   line-height: 1.6;
   margin: 13px 0 7px;
@@ -598,7 +598,7 @@ section {
   font-size: 35px;
   color: #b391f4;
 }
-.bottom-banner h3 {
+.bottom-banner h2 {
   font-size: 12px;
   font-weight: 650;
 }
@@ -1064,7 +1064,7 @@ footer {
   .bottom-banner > div {
     flex: 1;
   }
-  .bottom-banner h3 {
+  .bottom-banner h2 {
     font-size: 11px;
     line-height: 1.6;
   }
@@ -1151,5 +1151,61 @@ footer {
 @media (max-width: 700px) {
   .rawg-hero h2 {
     font-size: 36px;
+  }
+}
+.language-control select {
+  background: #1e1929;
+  border: 1px solid #6f588d;
+  color: #eee5ff;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 12px;
+  max-width: 110px;
+}
+.language-control option {
+  background: #181821;
+}
+.empty h2 {
+  font-size: 18px;
+  font-weight: 650;
+}
+.empty [role="alert"] > svg {
+  margin: 0 auto 15px;
+  color: #ad8cdf;
+}
+.favorite-button {
+  min-width: 36px;
+  min-height: 36px;
+}
+@media (max-width: 700px) {
+  .header-right {
+    gap: 8px;
+  }
+  .header-right .avatar {
+    display: none;
+  }
+  .language-control select {
+    font-size: 11px;
+    max-width: 95px;
+    padding: 8px 4px;
+  }
+}
+
+[role="region"][tabindex="-1"]:focus {
+  outline: 2px solid #64dfef;
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+footer a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .bottom-banner > div {
+    flex: 1 1 calc(100% - 60px);
+  }
+  .bottom-banner a {
+    flex-basis: calc(100% - 44px);
+    margin-left: 44px;
   }
 }

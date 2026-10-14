@@ -26,9 +26,7 @@ test("API de produção, navegação, busca e favoritos persistentes", async ({
   await expect(
     page.getByRole("link", { name: "Neon Odyssey", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Remover Neon Odyssey dos favoritos" })
-    .click();
+  await page.getByRole("button", { name: "Favoritar Neon Odyssey" }).click();
   await expect(page.getByText("Nada por aqui ainda")).toBeVisible();
   await page.getByRole("link", { name: "Descobrir jogos" }).click();
   await expect(page.locator(".game-card")).toHaveCount(25);

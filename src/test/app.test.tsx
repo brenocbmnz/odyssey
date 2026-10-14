@@ -1,3 +1,4 @@
+import { LanguageProvider } from "../i18n/LanguageContext";
 import { describe, it, expect } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -18,9 +19,11 @@ async function renderApp(path: string) {
   });
   return render(
     <QueryClientProvider client={client}>
-      <FavoritesProvider>
-        <RouterProvider router={router} />
-      </FavoritesProvider>
+      <LanguageProvider>
+        <FavoritesProvider>
+          <RouterProvider router={router} />
+        </FavoritesProvider>
+      </LanguageProvider>
     </QueryClientProvider>,
   );
 }
@@ -54,7 +57,7 @@ describe("Odyssey", () => {
     const view = await renderApp("/catalog");
     await userEvent.click(
       await screen.findByRole("button", {
-        name: "Adicionar Neon Odyssey aos favoritos",
+        name: "Favoritar Neon Odyssey",
       }),
     );
     expect(readFavorites()).toEqual(["1"]);
@@ -65,7 +68,7 @@ describe("Odyssey", () => {
     ).toBeVisible();
     await userEvent.click(
       screen.getByRole("button", {
-        name: "Remover Neon Odyssey dos favoritos",
+        name: "Favoritar Neon Odyssey",
       }),
     );
     expect(readFavorites()).toEqual([]);

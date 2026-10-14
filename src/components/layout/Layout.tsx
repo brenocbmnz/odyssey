@@ -1,3 +1,4 @@
+import { useLanguage } from "../../i18n/LanguageContext";
 import {
   Link,
   Outlet,
@@ -19,15 +20,28 @@ import { useEffect, useRef, useState } from "react";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import { isRawg } from "../../config/source";
 export function Layout() {
+  const { t, locale, setLocale } = useLanguage();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const { favorites, message } = useFavorites();
   const path = useRouterState({ select: (state) => state.location.pathname });
   const main = useRef<HTMLElement>(null);
+  const sidebar = useRef<HTMLElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!open) return;
+    closeButton.current?.focus();
+    const closeOutside = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !sidebar.current?.contains(event.target) &&
+        !menuButton.current?.contains(event.target)
+      )
+        setOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOutside);
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
@@ -35,7 +49,10 @@ export function Layout() {
       }
     };
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOutside);
+    };
   }, [open]);
   useEffect(() => {
     setOpen(false);
@@ -45,9 +62,22 @@ export function Layout() {
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
-        Pular para o conteúdo
+        {t("Pular para o conteúdo")}
       </a>
-      <aside className={`sidebar ${open ? "is-open" : ""}`}>
+      <aside
+        id="site-navigation"
+        ref={sidebar}
+        aria-label={t("Navegação principal")}
+        onBlur={(event) => {
+          if (
+            open &&
+            !event.currentTarget.contains(event.relatedTarget) &&
+            event.relatedTarget !== menuButton.current
+          )
+            setOpen(false);
+        }}
+        className={`sidebar ${open ? "is-open" : ""}`}
+      >
         <Link to="/" className="brand">
           <span className="brand-icon">
             <Gamepad2 size={23} />
@@ -56,24 +86,25 @@ export function Layout() {
           <i />
         </Link>
         <button
+          ref={closeButton}
           className="mobile-close icon-button"
           onClick={() => {
             setOpen(false);
             menuButton.current?.focus();
           }}
-          aria-label="Fechar navegação"
+          aria-label={t("Fechar navegação")}
         >
           <X />
         </button>
-        <p className="nav-label">EXPLORE SEU UNIVERSO</p>
-        <nav aria-label="Navegação principal">
+        <p className="nav-label">{t("EXPLORE SEU UNIVERSO")}</p>
+        <nav aria-label={t("Navegação principal")}>
           <Link
             to="/"
             activeProps={{ className: "nav-active", "aria-current": "page" }}
             activeOptions={{ exact: true }}
           >
             <LayoutDashboard size={19} />
-            Visão geral
+            {t("Visão geral")}
           </Link>
           <Link
             to="/catalog"
@@ -81,39 +112,41 @@ export function Layout() {
             activeProps={{ className: "nav-active", "aria-current": "page" }}
           >
             <Compass size={19} />
-            Catálogo de jogos
+            {t("Catálogo de jogos")}
           </Link>
           <Link
             to="/favorites"
             activeProps={{ className: "nav-active", "aria-current": "page" }}
           >
             <Heart size={19} />
-            Meus favoritos<span className="count">{favorites.length}</span>
+            {t("Meus favoritos")}
+            <span className="count">{favorites.length}</span>
           </Link>
         </nav>
         <div className="sidebar-bottom">
           <div className="discovery">
             <Sparkles size={23} />
-            <h3>
-              Sua próxima aventura
+            <h2>
+              {t("Sua próxima aventura")}
               <br />
-              começa aqui.
-            </h3>
-            <p>Explore. Descubra. Favorite.</p>
+              {t("começa aqui.")}
+            </h2>
+            <p>{t("Explore. Descubra. Favorite.")}</p>
             <Link
               to="/catalog"
               search={{ q: "", category: "", sort: "popularity" }}
             >
-              Explorar catálogo <ArrowUpRight size={16} />
+              {t("Explorar catálogo")}
+              <ArrowUpRight size={16} />
             </Link>
           </div>
           <div className="demo-note">
             <span className="online-dot" />
-            {isRawg ? "Catálogo conectado" : "Ambiente de demonstração"}
+            {isRawg ? t("Catálogo conectado") : t("Ambiente de demonstração")}
             <small>
               {isRawg
-                ? "Dados fornecidos pela RAWG"
-                : "Jogos e dados fictícios"}
+                ? t("Dados fornecidos pela RAWG")
+                : t("Jogos e dados fictícios")}
             </small>
           </div>
         </div>
@@ -125,7 +158,8 @@ export function Layout() {
             className="mobile-toggle icon-button"
             onClick={() => setOpen(!open)}
             aria-expanded={open}
-            aria-label="Abrir navegação"
+            aria-controls="site-navigation"
+            aria-label={t(open ? "Fechar navegação" : "Abrir navegação")}
           >
             <Menu />
           </button>
@@ -139,26 +173,48 @@ export function Layout() {
               });
             }}
             role="search"
+            aria-label={t("Pesquisar jogos")}
           >
             <Search size={18} />
             <input
-              aria-label="Pesquisar jogos"
-              placeholder="Encontre sua próxima aventura..."
+              aria-label={t("Pesquisar jogos")}
+              placeholder={t("Encontre sua próxima aventura...")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
-            <button type="submit" aria-label="Buscar jogos">
+            <button type="submit" aria-label={t("Buscar jogos")}>
               <ArrowUpRight size={18} />
             </button>
           </form>
           <div className="header-right">
+            <label className="language-control">
+              <span className="sr-only">{t("Idioma")}</span>
+              <select
+                value={locale}
+                onChange={(event) =>
+                  setLocale(event.target.value === "en" ? "en" : "pt-BR")
+                }
+              >
+                <option value="pt-BR" lang="pt-BR">
+                  Português
+                </option>
+                <option value="en" lang="en">
+                  English
+                </option>
+              </select>
+            </label>
             <span className="demo-badge">{isRawg ? "RAWG" : "DEMO"}</span>
-            <span className="avatar" aria-label="Perfil de visitante">
+            <span className="avatar" aria-hidden="true">
               OD
             </span>
           </div>
         </header>
-        <main id="main" ref={main} tabIndex={-1}>
+        <main
+          aria-label={t("Conteúdo principal")}
+          id="main"
+          ref={main}
+          tabIndex={-1}
+        >
           <Outlet />
         </main>
         <footer>
@@ -167,7 +223,7 @@ export function Layout() {
             {isRawg && (
               <>
                 {" "}
-                · Dados e imagens:{" "}
+                · {t("Dados e imagens:")}{" "}
                 <a
                   href="https://rawg.io"
                   target="_blank"
@@ -180,13 +236,18 @@ export function Layout() {
             )}
           </span>
           <span>
-            Feito para quem ama descobrir jogos.
+            {t("Feito para quem ama descobrir jogos.")}
             <span className="footer-dot">✦</span>
           </span>
         </footer>
       </div>
-      <div className="sr-only" role="status" aria-live="polite">
-        {message}
+      <div className="sr-only" role="status" aria-atomic="true">
+        {message && (
+          <>
+            {t(message)}{" "}
+            {t("{count} favoritos salvos", { count: favorites.length })}
+          </>
+        )}
       </div>
     </div>
   );

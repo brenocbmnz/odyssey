@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/LanguageContext";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -17,6 +18,7 @@ import { categories } from "../types/game";
 import { isRawg } from "../config/source";
 const icons = [Zap, Puzzle, Castle, Map, Coffee];
 export function Home() {
+  const { t, locale } = useLanguage();
   const popular = useGames({ sort: "popularity" });
   const recent = useGames({ sort: "release" });
   const featured = popular.data?.games[0];
@@ -24,42 +26,46 @@ export function Home() {
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">UM NOVO UNIVERSO A CADA CLIQUE</div>
+          <div className="eyebrow">{t("UM NOVO UNIVERSO A CADA CLIQUE")}</div>
           <h1>
-            Seu próximo jogo favorito
-            <br className="mobile-break" /> está aqui
+            {t("Seu próximo jogo favorito está aqui")}
             <span className="purple-dot">.</span>
           </h1>
           <p>
-            Descubra novas aventuras. Explore possibilidades. Jogue do seu
-            jeito.
+            {t(
+              "Descubra novas aventuras. Explore possibilidades. Jogue do seu jeito.",
+            )}
           </p>
         </div>
         <span className="collection-badge">
           <span className="online-dot" />
-          {isRawg ? "Jogos reais para descobrir" : "25 jogos para descobrir"}
+          {isRawg
+            ? t("Jogos reais para descobrir")
+            : t("25 jogos para descobrir")}
         </span>
       </div>
       <section
         className={`hero ${isRawg ? "rawg-hero" : ""}`}
-        aria-label="Jogo em destaque"
+        aria-label={t("Jogo em destaque")}
       >
         <img
           src={isRawg ? (featured?.image ?? "/art/hero.svg") : "/art/hero.svg"}
           alt={
             isRawg
-              ? `Capa de ${featured?.name ?? "jogo em destaque"}`
-              : "Paisagem espacial com montanhas neon e um planeta roxo"
+              ? t("Capa de {name}", {
+                  name: featured?.name ?? t("Jogo em destaque"),
+                })
+              : t("Paisagem espacial com montanhas neon e um planeta roxo")
           }
         />
         <div className="hero-content">
           <span className="featured-tag">
             <Sparkles size={13} />
-            {isRawg ? "DESTAQUE DO CATÁLOGO" : "DESTAQUE DA SEMANA"}
+            {isRawg ? t("DESTAQUE DO CATÁLOGO") : t("DESTAQUE DA SEMANA")}
           </span>
           <h2>
             {isRawg ? (
-              (featured?.name ?? "Descubra novos mundos")
+              (featured?.name ?? t("Descubra novos mundos"))
             ) : (
               <>
                 Neon
@@ -70,23 +76,27 @@ export function Home() {
           </h2>
           <p>
             {isRawg ? (
-              "Conheça uma das grandes descobertas do catálogo."
+              t("Conheça uma das grandes descobertas do catálogo.")
             ) : (
               <>
-                Além do horizonte, uma nova aventura.
+                {t("Além do horizonte, uma nova aventura.")}
                 <br />
-                Explore um universo onde tudo é possível.
+                {t("Explore um universo onde tudo é possível.")}
               </>
             )}
           </p>
           <div className="hero-meta">
             <span>
-              {isRawg ? (featured?.category ?? "Jogos reais") : "Arcade"}
+              {isRawg ? t(featured?.category ?? "Jogos reais") : "Arcade"}
             </span>
             <span>
               {isRawg
-                ? `★ ${featured?.rating ?? 0}/5 na RAWG`
-                : "★ 98% de popularidade"}
+                ? t("★ {rating}/5 na RAWG", {
+                    rating: new Intl.NumberFormat(locale).format(
+                      featured?.rating ?? 0,
+                    ),
+                  })
+                : t("★ 98% de popularidade")}
             </span>
           </div>
           {!isRawg || featured ? (
@@ -95,7 +105,7 @@ export function Home() {
                 to="/games/$gameId"
                 params={{ gameId: featured?.id ?? "1" }}
               >
-                Conhecer o jogo
+                {t("Conhecer o jogo")}
                 <ArrowUpRight size={17} />
               </Link>
             </Button>
@@ -105,19 +115,19 @@ export function Home() {
                 to="/catalog"
                 search={{ q: "", category: "", sort: "popularity" }}
               >
-                Explorar catálogo
+                {t("Explorar catálogo")}
               </Link>
             </Button>
           )}
         </div>
         <div className="hero-index">
-          <span>01</span> / 01 — EM DESTAQUE
+          <span>01</span> / 01 — {t("EM DESTAQUE")}
         </div>
       </section>
       <section className="categories-section">
         <div className="section-heading">
-          <h2>Encontre seu estilo</h2>
-          <span>Um mundo de possibilidades</span>
+          <h2>{t("Encontre seu estilo")}</h2>
+          <span>{t("Um mundo de possibilidades")}</span>
         </div>
         <div className="category-grid">
           {categories.map((category, i) => {
@@ -133,8 +143,8 @@ export function Home() {
                   <Icon size={22} />
                 </span>
                 <div>
-                  <strong>{category}</strong>
-                  <small>{isRawg ? "Explorar gênero" : "5 jogos"}</small>
+                  <strong>{t(category)}</strong>
+                  <small>{isRawg ? t("Explorar gênero") : t("5 jogos")}</small>
                 </div>
                 <ArrowUpRight size={15} />
               </Link>
@@ -147,19 +157,20 @@ export function Home() {
           <div>
             <h2>
               <Flame size={21} className="purple" />
-              Em alta agora
+              {t("Em alta agora")}
             </h2>
-            <p>Os favoritos da comunidade, esperando por você.</p>
+            <p>{t("Os favoritos da comunidade, esperando por você.")}</p>
           </div>
           <Link
             to="/catalog"
             search={{ sort: "popularity", q: "", category: "" }}
           >
-            Ver todos
+            {t("Ver todos")}
             <ArrowRight size={16} />
           </Link>
         </div>
         <GameGrid
+          label={t("Em alta agora")}
           games={popular.data?.games.slice(0, 4)}
           loading={popular.isPending}
           error={popular.isError}
@@ -171,16 +182,17 @@ export function Home() {
           <div>
             <h2>
               <Sparkles size={20} className="cyan" />
-              Acabaram de chegar
+              {t("Acabaram de chegar")}
             </h2>
-            <p>Novos mundos para adicionar à sua coleção.</p>
+            <p>{t("Novos mundos para adicionar à sua coleção.")}</p>
           </div>
           <Link to="/catalog" search={{ sort: "release", q: "", category: "" }}>
-            Ver novidades
+            {t("Ver novidades")}
             <ArrowRight size={16} />
           </Link>
         </div>
         <GameGrid
+          label={t("Acabaram de chegar")}
           games={recent.data?.games.slice(0, 4)}
           loading={recent.isPending}
           error={recent.isError}
@@ -190,14 +202,14 @@ export function Home() {
       <div className="bottom-banner">
         <GamepadMark />
         <div>
-          <h3>Grandes descobertas começam com curiosidade.</h3>
-          <p>Seu novo favorito pode estar a um clique de distância.</p>
+          <h2>{t("Grandes descobertas começam com curiosidade.")}</h2>
+          <p>{t("Seu novo favorito pode estar a um clique de distância.")}</p>
         </div>
         <Link
           to="/catalog"
           search={{ q: "", category: "", sort: "popularity" }}
         >
-          Explorar todos os jogos
+          {t("Explorar todos os jogos")}
           <ArrowRight size={17} />
         </Link>
       </div>

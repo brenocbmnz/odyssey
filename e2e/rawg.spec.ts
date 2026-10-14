@@ -44,9 +44,7 @@ test("modo RAWG: destaque, paginação, busca e favoritos fora da primeira pági
   await expect(
     page.getByRole("button", { name: "Próxima", exact: true }),
   ).toBeDisabled();
-  await page
-    .getByRole("button", { name: "Adicionar Portal 2 aos favoritos" })
-    .click();
+  await page.getByRole("button", { name: "Favoritar Portal 2" }).click();
   await page.goto("/favorites");
   await page.reload();
   await expect(
@@ -54,7 +52,7 @@ test("modo RAWG: destaque, paginação, busca e favoritos fora da primeira pági
   ).toBeVisible();
   await page.getByRole("link", { name: "Portal 2", exact: true }).click();
   await expect(page.getByText("Não informada", { exact: true })).toBeVisible();
-  await expect(page.getByText("4.6 / 5", { exact: true })).toBeVisible();
+  await expect(page.getByText("4,6 / 5", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Remover dos favoritos" }),
   ).toBeVisible();

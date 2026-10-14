@@ -1,6 +1,6 @@
 # Odyssey
 
-Catálogo de jogos com React, TypeScript estrito, Vite e Tailwind CSS. Possui dois modos: **demo**, com 25 jogos locais e MSW, e **RAWG**, com jogos reais, capas, gêneros, descrições e avaliações. Inclui home, busca, filtros, ordenação, paginação, detalhes e favoritos persistidos.
+Catálogo de jogos com React, TypeScript estrito, Vite e Tailwind CSS. Possui dois modos: **demo**, com 25 jogos locais e MSW, e **RAWG**, com jogos reais, capas, gêneros, descrições e avaliações. Inclui home, busca, filtros, ordenação, paginação, detalhes e favoritos persistidos. A interface está disponível em português e inglês, com seletor no header e preferência salva no navegador.
 
 ## Executar
 
@@ -64,6 +64,7 @@ No modo RAWG, os filtros usam Ação, Puzzle, Estratégia, Aventura e Casual. Os
 api/                    Entradas das funções Vercel
 server/rawg.ts          Proxy, filtros, normalização e erros upstream
 src/config/             Seleção demo/RAWG
+src/i18n/               Contexto de idioma, interpolação e dicionário inglês
 src/components/ui/      Button no padrão shadcn/ui com Radix e CVA
 src/components/layout/  Sidebar, header, navegação e atribuição
 src/components/games/   Cards e grid
@@ -133,3 +134,11 @@ Evoluções possíveis: busca por plataforma/loja, validação de payloads por s
 - [Vercel: funções Node.js](https://vercel.com/docs/functions/runtimes/node-js)
 - [Vite na Vercel](https://vercel.com/docs/frameworks/frontend/vite)
 - [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/reference/useQuery)
+
+## Idiomas e acessibilidade
+
+A escolha entre português e inglês atualiza `html.lang`, título da página, labels, feedback, categorias e formatação de números/datas. Os valores usados nos filtros da API permanecem estáveis, independentemente do idioma. Nomes de jogos e descrições da RAWG preservam o conteúdo original; não há tradução automática da API.
+
+A navegação móvel segue o padrão disclosure: `aria-expanded`, `aria-controls`, foco inicial, Escape e retorno ao botão. Favoritos usam labels estáveis com `aria-pressed`; filtros são um grupo nomeado que controla a região do catálogo. Loading usa `aria-busy`, mensagens usam status e erros usam alert. As regiões de resultados, os cards e a paginação possuem nomes acessíveis. O foco é recuperado após remover um favorito ou tentar novamente.
+
+Os testes de navegador incluem axe-core com regras WCAG A/AA, nos dois idiomas e nas resoluções desktop/mobile, cobrindo home, catálogo, detalhes, favoritos, estado vazio e 404. Testes também verificam persistência do idioma e interação por teclado. Uma auditoria automatizada não substitui avaliação manual com leitores de tela. Veja [ACCESSIBILITY.md](ACCESSIBILITY.md) para os pontos analisados e a cobertura.

@@ -1,8 +1,8 @@
+import { NotFound, RouteError } from "../pages/RouteErrors";
 import {
   createRootRoute,
   createRoute,
   createRouter,
-  Link,
 } from "@tanstack/react-router";
 import { Layout } from "../components/layout/Layout";
 import { Home } from "../pages/Home";
@@ -12,18 +12,8 @@ import { GameDetails } from "../pages/GameDetails";
 import { categories, type Category, type Sort } from "../types/game";
 const root = createRootRoute({
   component: Layout,
-  notFoundComponent: () => (
-    <div className="empty">
-      <h1>Página não encontrada</h1>
-      <Link to="/">Voltar ao início</Link>
-    </div>
-  ),
-  errorComponent: () => (
-    <div className="empty" role="alert">
-      <h1>Algo deu errado</h1>
-      <a href="/">Recarregar aplicação</a>
-    </div>
-  ),
+  notFoundComponent: NotFound,
+  errorComponent: RouteError,
 });
 const home = createRoute({
   getParentRoute: () => root,

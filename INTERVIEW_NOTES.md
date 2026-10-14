@@ -65,3 +65,13 @@ O modo real mantém o contrato do front-end e substitui MSW por duas funções s
 O proxy traduz gêneros e ordenação, normaliza cards e detalhes e converte links de paginação em `hasMore`. Isso impede vazar a chave que poderia estar embutida em `next`. Só respostas bem-sucedidas recebem cache compartilhado. O catálogo real é ordenado por adições na RAWG, não por jogadores simultâneos; a nota exibida é de 0 a 5. Há atribuição à RAWG em todas as páginas.
 
 Os testes do proxy substituem a resposta upstream por fixtures e verificam erro, paginação, parâmetros e não exposição da chave. Os testes de navegador do modo real verificam favoritos além da primeira página e ausência de MSW, sem consumir a cota pessoal. Validar uma chave real exige configurá-la no ambiente e fazer a verificação na aplicação.
+
+## Idiomas e ARIA
+
+O contexto de idioma mantém apenas a preferência local. Um dicionário traduz a interface e interpola nomes, contagens e categorias. `Intl` formata números e datas. A UI muda sem alterar IDs, filtros da API ou cache remoto. O documento muda seu `lang` para que leitores de tela usem a pronúncia adequada. Os textos externos da RAWG permanecem no idioma original.
+
+Usei primeiro HTML nativo: links para navegar, botões para ações, select para idioma e landmarks para organizar a página. ARIA complementa esse HTML: `aria-current` indica a rota, `aria-pressed` indica favoritos/filtros, `aria-expanded` e `aria-controls` descrevem o menu móvel, `aria-busy` marca consultas e status/alert comunicam feedback. A navegação do site não usa `role=menu`, porque essa função exigiria o modelo de teclado de um menu de aplicação.
+
+Labels dos botões de favorito permanecem estáveis: o estado pressionado muda, evitando alternar simultaneamente nome e estado de um toggle. Os botões de ação nos detalhes mudam seu texto e não usam `aria-pressed`. Foco e leitura são cuidados distintos: ARIA explica estado, mas o código precisa mover ou recuperar foco nos casos adequados. Escape devolve foco ao botão do menu; remover um card de favoritos devolve foco ao título da coleção.
+
+Axe-core ajuda a identificar violações automatizáveis. Playwright verifica teclado, persistência e comportamento; a auditoria manual com NVDA/VoiceOver continua necessária para confirmar uma experiência completa.

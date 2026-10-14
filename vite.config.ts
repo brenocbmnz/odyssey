@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
     ],
     test: {
       environment: "jsdom",
+      env: { VITE_GAME_SOURCE: "demo" },
       testTimeout: 15000,
       exclude: ["e2e/**", "node_modules/**"],
       setupFiles: ["./src/test/setup.ts"],
