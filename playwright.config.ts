@@ -5,8 +5,8 @@ export default defineConfig({
   timeout: 60000,
   testMatch:
     process.env.E2E_SOURCE === "rawg"
-      ? ["rawg.spec.ts", "accessibility.spec.ts"]
-      : ["gamehub.spec.ts", "accessibility.spec.ts"],
+      ? ["rawg.spec.ts", "accessibility.spec.ts", "discovery.spec.ts"]
+      : ["gamehub.spec.ts", "accessibility.spec.ts", "discovery.spec.ts"],
   use: { baseURL: "http://127.0.0.1:4173" },
   webServer: {
     command: "npm run preview -- --host 127.0.0.1",
@@ -15,6 +15,9 @@ export default defineConfig({
   },
   projects: [
     { name: "desktop", use: { viewport: { width: 1440, height: 1000 } } },
-    { name: "mobile", use: { viewport: { width: 390, height: 844 } } },
+    {
+      name: "mobile",
+      use: { hasTouch: true, viewport: { width: 390, height: 844 } },
+    },
   ],
 });

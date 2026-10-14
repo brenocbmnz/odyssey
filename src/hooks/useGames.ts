@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchGame, fetchGames } from "../services/api";
 import type { GameFilters } from "../types/game";
-export function useGames(filters: GameFilters = {}) {
+export function useGames(filters: GameFilters = {}, enabled = true) {
   return useQuery({
+    enabled,
     queryKey: ["games", filters],
     queryFn: ({ signal }) => fetchGames(filters, signal),
     staleTime: 60000,

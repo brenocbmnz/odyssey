@@ -46,7 +46,8 @@ As funções em `api/games.ts` e `api/games/[id].ts` são detectadas pela Vercel
 
 ## Funcionalidades e dados
 
-- Home com destaque dinâmico, populares, novidades e categorias.
+- Home com carrossel de até cinco destaques, setas, indicadores e anúncios acessíveis; populares, novidades e categorias.
+- Pesquisa no header com sugestões, capas, limpeza e seleção por teclado/toque. Enter abre a sugestão selecionada ou consulta o catálogo; Escape fecha a lista.
 - Busca por nome com debounce de 350ms, filtros e ordenação na URL.
 - Catálogo real paginado com 24 jogos por página; demo com 25 jogos.
 - Detalhes, avaliação RAWG de 0 a 5 e tratamento de datas/imagens ausentes.
@@ -142,3 +143,9 @@ A escolha entre português e inglês atualiza `html.lang`, título da página, l
 A navegação móvel segue o padrão disclosure: `aria-expanded`, `aria-controls`, foco inicial, Escape e retorno ao botão. Favoritos usam labels estáveis com `aria-pressed`; filtros são um grupo nomeado que controla a região do catálogo. Loading usa `aria-busy`, mensagens usam status e erros usam alert. As regiões de resultados, os cards e a paginação possuem nomes acessíveis. O foco é recuperado após remover um favorito ou tentar novamente.
 
 Os testes de navegador incluem axe-core com regras WCAG A/AA, nos dois idiomas e nas resoluções desktop/mobile, cobrindo home, catálogo, detalhes, favoritos, estado vazio e 404. Testes também verificam persistência do idioma e interação por teclado. Uma auditoria automatizada não substitui avaliação manual com leitores de tela. Veja [ACCESSIBILITY.md](ACCESSIBILITY.md) para os pontos analisados e a cobertura.
+
+## Descoberta e pesquisa
+
+O componente `FeaturedCarousel` reutiliza os jogos populares já consultados e mostra um destaque por vez. Setas e indicadores são botões nativos; o slide é nomeado por posição e jogo. A troca é manual, sem avanço automático, e as transições respeitam redução de movimento.
+
+O `SearchBar` implementa uma combobox com listbox de até seis sugestões. As consultas só iniciam com pelo menos dois caracteres e após debounce de 350ms. Setas movem a opção ativa, Enter abre o jogo escolhido e Escape fecha a lista mantendo o foco. Sem opção ativa, Enter pesquisa no catálogo. A URL do catálogo sincroniza o texto da pesquisa. Erros e ausência de resultados são explícitos; o catálogo continua disponível para realizar a busca completa.

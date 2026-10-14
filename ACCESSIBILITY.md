@@ -38,3 +38,13 @@ Os dados externos não são traduzidos automaticamente. As descrições RAWG sã
 - [WAI: padrão Disclosure](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/)
 - [WAI: navegação com disclosure](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/)
 - [WAI: mensagens de status](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA22)
+
+## Carrossel e pesquisa com sugestões
+
+O destaque segue o padrão de carrossel com `aria-roledescription` localizado, slide nomeado e status de posição. Apenas o slide ativo é renderizado. Os controles permanecem no DOM para preservar foco e a navegação é manual.
+
+A pesquisa mantém foco no input com `role=combobox`, `aria-autocomplete=list`, `aria-expanded`, `aria-controls` e `aria-activedescendant`. Opções usam `role=option` e `aria-selected`. O teclado permite escolher, abrir e fechar sugestões; mouse e toque selecionam jogos. A listbox contém somente opções; loading, erros e ação para ver todos os resultados ficam fora dela.
+
+Os testes de descoberta cobrem controles do carrossel, seleção por teclado, Escape, limpar, busca completa, estado vazio, clique/toque, idioma e auditoria axe com a lista aberta.
+
+Referências: [padrão de carrossel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) e [padrão de combobox](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).

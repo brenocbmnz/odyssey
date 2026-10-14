@@ -1,16 +1,11 @@
+import { SearchBar } from "./SearchBar";
 import { useLanguage } from "../../i18n/LanguageContext";
-import {
-  Link,
-  Outlet,
-  useNavigate,
-  useRouterState,
-} from "@tanstack/react-router";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import {
   Gamepad2,
   LayoutDashboard,
   Compass,
   Heart,
-  Search,
   ArrowUpRight,
   Menu,
   X,
@@ -22,8 +17,6 @@ import { isRawg } from "../../config/source";
 export function Layout() {
   const { t, locale, setLocale } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const navigate = useNavigate();
   const { favorites, message } = useFavorites();
   const path = useRouterState({ select: (state) => state.location.pathname });
   const main = useRef<HTMLElement>(null);
@@ -163,29 +156,7 @@ export function Layout() {
           >
             <Menu />
           </button>
-          <form
-            className="header-search"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void navigate({
-                to: "/catalog",
-                search: { q: search, category: "", sort: "popularity" },
-              });
-            }}
-            role="search"
-            aria-label={t("Pesquisar jogos")}
-          >
-            <Search size={18} />
-            <input
-              aria-label={t("Pesquisar jogos")}
-              placeholder={t("Encontre sua próxima aventura...")}
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-            <button type="submit" aria-label={t("Buscar jogos")}>
-              <ArrowUpRight size={18} />
-            </button>
-          </form>
+          <SearchBar />
           <div className="header-right">
             <label className="language-control">
               <span className="sr-only">{t("Idioma")}</span>

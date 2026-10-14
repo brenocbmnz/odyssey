@@ -104,6 +104,26 @@ describe("Odyssey", () => {
       response: { status: 404 },
     });
   });
+  it("mostra falha nas sugestões e permite pesquisar no catálogo", async () => {
+    server.use(
+      http.get("/api/games", () => HttpResponse.json({}, { status: 500 })),
+    );
+    await renderApp("/");
+    const input = screen.getByRole("combobox", {
+      name: "Pesquisar jogos",
+    });
+    await userEvent.type(input, "portal");
+    expect(
+      await screen.findByText(
+        "Não foi possível carregar as sugestões. Tente buscar no catálogo.",
+        { selector: ".suggestion-message" },
+      ),
+    ).toBeVisible();
+    await userEvent.keyboard("{Enter}");
+    expect(
+      await screen.findByRole("heading", { name: "Catálogo de jogos." }),
+    ).toBeVisible();
+  });
   it("tolera dados de favoritos inválidos", () => {
     localStorage.setItem(favoritesKey, "{");
     expect(readFavorites()).toEqual([]);

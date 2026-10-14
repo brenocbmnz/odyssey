@@ -1,4 +1,24 @@
 export const english: Record<string, string> = {
+  "Jogos em destaque": "Featured games",
+  carrossel: "carousel",
+  slide: "slide",
+  "Escolher destaque": "Choose featured game",
+  "{position} de {total}: {name}": "{position} of {total}: {name}",
+  "Mostrar {name}": "Show {name}",
+  "Destaque anterior": "Previous featured game",
+  "Próximo destaque": "Next featured game",
+  "★ {value}% de popularidade": "★ {value}% popularity",
+  "Nenhum destaque disponível": "No featured games available",
+  "Pesquisar jogos...": "Search games...",
+  "Limpar pesquisa": "Clear search",
+  "Digite pelo menos dois caracteres. Use as setas para escolher uma sugestão, Enter para abrir e Escape para fechar.":
+    "Type at least two characters. Use arrow keys to choose a suggestion, Enter to open, and Escape to close.",
+  "Sugestões de jogos": "Game suggestions",
+  "Não foi possível carregar as sugestões. Tente buscar no catálogo.":
+    "Could not load suggestions. Try searching the catalog.",
+  "Ver todos os resultados": "View all results",
+  "{count} sugestões disponíveis": "{count} suggestions available",
+
   "Conteúdo principal": "Main content",
   "{count} favoritos salvos": "{count} saved favorites",
   "Pular para o conteúdo": "Skip to content",

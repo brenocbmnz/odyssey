@@ -13,15 +13,14 @@ import {
 } from "lucide-react";
 import { useGames } from "../hooks/useGames";
 import { GameGrid } from "../components/games/GameGrid";
-import { Button } from "../components/ui/button";
+import { FeaturedCarousel } from "../components/games/FeaturedCarousel";
 import { categories } from "../types/game";
 import { isRawg } from "../config/source";
 const icons = [Zap, Puzzle, Castle, Map, Coffee];
 export function Home() {
-  const { t, locale } = useLanguage();
+  const { t } = useLanguage();
   const popular = useGames({ sort: "popularity" });
   const recent = useGames({ sort: "release" });
-  const featured = popular.data?.games[0];
   return (
     <>
       <div className="page-heading">
@@ -44,86 +43,10 @@ export function Home() {
             : t("25 jogos para descobrir")}
         </span>
       </div>
-      <section
-        className={`hero ${isRawg ? "rawg-hero" : ""}`}
-        aria-label={t("Jogo em destaque")}
-      >
-        <img
-          src={isRawg ? (featured?.image ?? "/art/hero.svg") : "/art/hero.svg"}
-          alt={
-            isRawg
-              ? t("Capa de {name}", {
-                  name: featured?.name ?? t("Jogo em destaque"),
-                })
-              : t("Paisagem espacial com montanhas neon e um planeta roxo")
-          }
-        />
-        <div className="hero-content">
-          <span className="featured-tag">
-            <Sparkles size={13} />
-            {isRawg ? t("DESTAQUE DO CATÁLOGO") : t("DESTAQUE DA SEMANA")}
-          </span>
-          <h2>
-            {isRawg ? (
-              (featured?.name ?? t("Descubra novos mundos"))
-            ) : (
-              <>
-                Neon
-                <br />
-                Odyssey
-              </>
-            )}
-          </h2>
-          <p>
-            {isRawg ? (
-              t("Conheça uma das grandes descobertas do catálogo.")
-            ) : (
-              <>
-                {t("Além do horizonte, uma nova aventura.")}
-                <br />
-                {t("Explore um universo onde tudo é possível.")}
-              </>
-            )}
-          </p>
-          <div className="hero-meta">
-            <span>
-              {isRawg ? t(featured?.category ?? "Jogos reais") : "Arcade"}
-            </span>
-            <span>
-              {isRawg
-                ? t("★ {rating}/5 na RAWG", {
-                    rating: new Intl.NumberFormat(locale).format(
-                      featured?.rating ?? 0,
-                    ),
-                  })
-                : t("★ 98% de popularidade")}
-            </span>
-          </div>
-          {!isRawg || featured ? (
-            <Button asChild>
-              <Link
-                to="/games/$gameId"
-                params={{ gameId: featured?.id ?? "1" }}
-              >
-                {t("Conhecer o jogo")}
-                <ArrowUpRight size={17} />
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild>
-              <Link
-                to="/catalog"
-                search={{ q: "", category: "", sort: "popularity" }}
-              >
-                {t("Explorar catálogo")}
-              </Link>
-            </Button>
-          )}
-        </div>
-        <div className="hero-index">
-          <span>01</span> / 01 — {t("EM DESTAQUE")}
-        </div>
-      </section>
+      <FeaturedCarousel
+        games={popular.data?.games}
+        loading={popular.isPending}
+      />
       <section className="categories-section">
         <div className="section-heading">
           <h2>{t("Encontre seu estilo")}</h2>
